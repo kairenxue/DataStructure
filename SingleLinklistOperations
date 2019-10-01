@@ -1,0 +1,176 @@
+//单链表的基本算法实现
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct LNode
+{
+	ElementType data;
+	struct LNode *next;
+}LinkList;
+//头插法建表
+void CreateLinklistInHEAD(LinkList *&head, ElementType array[], int n)
+{
+	LinkList *p;
+	head = (LinkList *)malloc(sizeof(LinkList));
+	head->next = NULL; //先置为空表
+	for (int i = 0; i < n; i++)
+	{
+		p = (LinkList *)malloc(sizeof(LinkList));
+		p->data = array[i];
+		p->next = head->next;
+		head->next = p;
+	}
+}
+//尾插法建表
+void CreateLinklistInTAIL(LinkList *&head, ElementType array[], int n)
+{
+	LinkList *tail, *p;
+	head = (LinkList *)malloc(sizeof(LinkList));
+	tail = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (LinkList *)malloc(sizeof(LinkList));
+		p->data = array[i];
+		tail->next = p;
+		tail = p;
+	}
+	tail->next = NULL;
+}
+//按元素值查找算法
+int FindElement(LinkList *head, ElementType e)
+{
+	LinkList *p;
+	p = head->next;
+	int pos = 1;
+	while (p != NULL&&p->data != e)
+	{
+		pos++;
+		p = p->next;
+	}
+	if (p != NULL)
+		return pos;
+	else
+		return 0;
+}
+//插入元素到链表的第i个位置
+void InsertElementInPos(LinkList *head, ElementType e, int pos)
+{
+	LinkList *p, *node;
+	int count = 1, n = 1;
+	p = head->next;
+	for (p = head->next; p != NULL; p = p->next)
+		count++;
+	if (pos < 1)
+		cout << "插入位置错误！" << endl;
+	else if (pos == 1)
+	{
+		p = (LinkList*)malloc(sizeof(LinkList));
+		p->data = e;
+		p->next = head->next;
+		head->next = p;
+	}
+	else if (pos <= count)
+	{
+		//先找到插入位置的前一个位置
+		p = head->next;
+		while (n < pos)
+		{
+			p = p->next;
+			n++;
+		}
+		node = (LinkList*)malloc(sizeof(LinkList));
+		node->data = e;
+		node->next = p->next;
+		p->next = node;
+	}
+	if (pos > count)
+	{
+		p = head->next;
+		while (p != NULL)
+			p = p->next;
+		node = (LinkList*)malloc(sizeof(LinkList));
+		node->data = e;
+		node->next = NULL;
+		p->next = node;
+	}
+}
+//删除链表的第i个位置
+void DeleteElementInPos(LinkList *head, int pos)
+{
+	LinkList *p, *pre;
+	int count = 0, n = 1;
+	for (p = head->next; p != NULL; p = p->next)
+		count++;
+	p = head->next;
+	while (n < pos - 1)
+	{
+		p = p->next;
+		n++;
+	}
+	pre = p->next;
+	p->next = pre->next;
+	free(pre);
+	cout << "删除成功！" << endl;
+}
+//输出链表
+void PrintLinkList(LinkList *head)
+{
+	LinkList* p;
+	p = head->next;
+	while (p != NULL)
+	{
+		cout << p->data << "->";
+		p = p->next;
+	}
+	cout << endl;
+}
+//销毁链表中的每个元素
+void DestroyLinkList(LinkList *head)
+{
+	LinkList *pre, *p;
+	p = head->next;
+	while (p != NULL)
+	{
+		pre = p;
+		cout << "释放" << p->data << " ";
+		p = p->next;
+		free(pre);
+	}
+	cout << "释放头结点" << endl;
+	free(head);
+}
+int main()
+{
+	LinkList *head;
+	int Element[10] = { 1,2,3,4,5,6,7,8,9,10 }, pos;
+	cout << "头插法建立单链表" << endl;
+	CreateLinklistInHEAD(head, Element, 10);
+	cout << "头插法建表结果" << endl;
+	PrintLinkList(head);
+	cout << "在单链表中插入元素" << endl;
+	InsertElementInPos(head, 11, 1);
+	PrintLinkList(head);
+	cout << "在单链表中查找元素9" << endl;
+	pos = FindElement(head, 9);
+	cout << "所在位置为" << pos << endl;
+	cout << "删除位置为3的元素" << endl;
+	DeleteElementInPos(head, 3);
+	PrintLinkList(head);
+	cout << "销毁单链表" << endl << endl;
+	DestroyLinkList(head);
+
+	CreateLinklistInTAIL(head, Element, 10);
+	cout << "尾插法建表结果" << endl;
+	PrintLinkList(head);
+	cout << "在单链表中插入元素" << endl;
+	InsertElementInPos(head, 11, 10);
+	PrintLinkList(head);
+	cout << "删除位置为3的元素" << endl;
+	DeleteElementInPos(head, 3);
+	PrintLinkList(head);
+	cout << "销毁单链表" << endl;
+	DestroyLinkList(head);
+	system("pause");
+	return 0;
+}
