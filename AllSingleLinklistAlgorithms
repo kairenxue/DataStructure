@@ -1,0 +1,724 @@
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct LNode
+{
+	ElementType data;
+	struct LNode *next;
+}LinkList;
+//头插法创建单链表
+void CreateLinklistInHEAD(LinkList *&head, ElementType array[], int n)
+{
+	LinkList *p;
+	head = (LinkList *)malloc(sizeof(LinkList));
+	head->next = NULL; //先置为空表
+	for (int i = 0; i < n; i++)
+	{
+		p = (LinkList *)malloc(sizeof(LinkList));
+		p->data = array[i];
+		p->next = head->next;
+		head->next = p;
+	}
+}
+//尾插法创建单链表
+void CreateLinklistInTAIL(LinkList *&head, ElementType array[], int n)
+{
+	LinkList *tail, *p;
+	head = (LinkList *)malloc(sizeof(LinkList));
+	tail = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (LinkList *)malloc(sizeof(LinkList));
+		p->data = array[i];
+		tail->next = p;
+		tail = p;
+	}
+	tail->next = NULL;
+}
+//按元素值查找算法
+int FindElement(LinkList *head, ElementType e)
+{
+	LinkList *p;
+	p = head->next;
+	int pos = 1;
+	while (p != NULL&&p->data != e)
+	{
+		pos++;
+		p = p->next;
+	}
+	if (p != NULL)
+		return pos;
+	else
+		return 0;
+}
+//插入元素到链表的第i个位置
+void InsertElementInPos(LinkList *head, ElementType e, int pos)
+{
+	LinkList *p, *node;
+	int count = 1, n = 1;
+	p = head->next;
+	for (p = head->next; p != NULL; p = p->next)
+		count++;
+	if (pos < 1)
+		cout << "插入位置错误！" << endl;
+	else if (pos == 1)
+	{
+		p = (LinkList*)malloc(sizeof(LinkList));
+		p->data = e;
+		p->next = head->next;
+		head->next = p;
+	}
+	else if (pos <= count)
+	{
+		//先找到插入位置的前一个位置
+		p = head->next;
+		while (n < pos)
+		{
+			p = p->next;
+			n++;
+		}
+		node = (LinkList*)malloc(sizeof(LinkList));
+		node->data = e;
+		node->next = p->next;
+		p->next = node;
+	}
+	if (pos > count)
+	{
+		p = head->next;
+		while (p != NULL)
+			p = p->next;
+		node = (LinkList*)malloc(sizeof(LinkList));
+		node->data = e;
+		node->next = NULL;
+		p->next = node;
+	}
+}
+//删除链表的第i个位置
+void DeleteElementInPos(LinkList *head, int pos)
+{
+	LinkList *p, *pre;
+	int count = 0, n = 1;
+	for (p = head->next; p != NULL; p = p->next)
+		count++;
+	p = head->next;
+	while (n < pos - 1)
+	{
+		p = p->next;
+		n++;
+	}
+	pre = p->next;
+	p->next = pre->next;
+	free(pre);
+	cout << "删除成功！" << endl;
+}
+//输出链表
+void PrintLinkList(LinkList *head)
+{
+	LinkList* p;
+	p = head->next;
+	while (p != NULL)
+	{
+		cout << p->data << "->";
+		p = p->next;
+	}
+	cout << endl;
+}
+//销毁链表中的每个元素
+void DestroyLinkList(LinkList *head)
+{
+	LinkList *pre, *p;
+	pre = head;
+	p = head->next;
+	while (p != NULL)
+	{
+		pre = p;
+		p = p->next;
+		cout << "释放" << pre->data << " ";
+		free(pre);	
+	}
+	cout << "释放头结点" << endl;
+	free(head);
+}
+/*设计一个算法删除单链表中第一个值为x的节点*/
+void DeleteFirstElement_x(LinkList *head, int x)
+{
+	LinkList *p,*pre;
+	p = head->next;
+	pre = head;
+	while (p != NULL&&p->data != x)
+	{
+		pre = p;
+		p = p->next;
+	}
+	if (p != NULL)
+	{
+		pre->next = p->next;
+		free(p);
+		return;
+	}
+	else
+		cout << "表中不存在" << x << endl;
+}
+/*设计一个算法删除单链表中含两个或者两个以上的数据节点中第一个值为x的节点的前驱节点*/
+void DeleteElementBefore_x(LinkList *head, int x)
+{
+	//设计此算法需要三个指针协助完成运算
+	LinkList *prepre, *pre, *p;
+	prepre = head;
+	pre = head->next;
+	p = pre->next;
+	while (p != NULL&&p->data!=x) //找到x
+	{
+		prepre = pre;
+		pre = p;
+		p = p->next;
+	}
+	if (p != NULL)
+	{
+		prepre->next = p;
+		free(pre);
+		return;
+	}
+	else
+		cout << "不存这样的节点" << x << endl;
+}
+/*设计一个算法判断单链表L是否是递增的*/
+void JudgeLinkListIsAscend(LinkList *head)
+{
+	LinkList *pre, *p;
+	pre = head->next;
+	p = pre->next;
+	while (p != NULL)
+	{
+		if (pre->data <= p->data)
+		{
+			pre = p;
+			p = p->next;
+		}
+		else
+		{
+			cout << "不是升序" << endl;
+			return ;
+		}
+	}
+	cout << "链表是升序" << endl;
+}
+/*设计一个在带头结点的单链表中删除一个最小值节点的算法*/
+void DeleteSamllestElement(LinkList *head)
+{
+	LinkList *pre, *p, *smallest, *presmallest;
+	p = head->next;
+	pre = head;
+	presmallest = head;
+	smallest = p;
+	while (p != NULL)
+	{
+		if (p->data < smallest->data)
+		{
+			smallest = p;
+			presmallest = pre;
+		}
+		pre = p;
+		p = p->next;
+	}
+	presmallest->next = smallest->next;
+	free(smallest);
+}
+/*在一个单链表中，节点个数至少为2，采用带头结点的单链表L存储，使用头插法算法将其就地逆置。*/
+void LocalInversionSolu1(LinkList *&head,LinkList *L)
+{
+	LinkList *p, *q;
+	head = (LinkList *)malloc(sizeof(LinkList));
+	p = L->next;
+	head->next = NULL;
+	while (p != NULL)
+	{
+		q = p->next;
+		p->next = head->next;
+		head->next = p;
+		p = q;
+	}
+}
+/*在一个单链表中，节点个数至少为2，采用带头结点的单链表L存储，设计一个算法辅助空间为o(1)将其就地逆置。*/
+void LocalInversionSolu2(LinkList *head)
+{
+	//使用三个指针实现就地逆置
+	LinkList *pre, *p, *post;
+	pre = head->next;
+	p = pre->next;
+	pre->next = NULL;
+	while (p != NULL)
+	{
+		post = p->next;
+		p->next = pre;
+		pre = p;
+		p = post;
+	}
+	head->next = pre;
+}
+/*单链表A中都是整数元素，设计一个算法将其元素按奇偶分开，且相对次序不变*/
+void SeperateLinkListByOdd_Even(LinkList *&headOdd,LinkList *&headEven)
+{
+	//将链表中的数据是奇数的话保存在headOdd表中，偶数保存在headEven表，采用尾插法，保持原来的次序，便于对比
+	LinkList *p, *pOdd, *pEven,*tailEven,*tailOdd;
+	p = headOdd->next;
+	headEven = (LinkList *)malloc(sizeof(LinkList));
+	tailEven = headEven;
+	tailOdd = headOdd;
+	while (p != NULL)
+	{
+		if (p->data % 2 == 0)
+		{
+			tailEven->next=p;
+			tailEven = p;
+			p = p->next;
+		}
+		else
+		{
+			tailOdd->next = p;
+			tailOdd = p;
+			p = p->next;
+		}	
+	}
+	tailEven->next = NULL;
+	tailOdd->next = NULL;
+}
+/*C为一个单链表（a1,b1,a2,b2...），带头结点，设计一个就地算法，将其拆分为2个线性表,元素对应分离*/
+void SeperateLinkList(LinkList *head, LinkList *&headOdd, LinkList *&headEven)
+{
+	LinkList *p, *pOdd, *pEven, *tailOdd, *tailEven;
+	p = head->next;
+	headOdd = (LinkList *)malloc(sizeof(LinkList));
+	headEven = (LinkList *)malloc(sizeof(LinkList));
+	tailOdd = headOdd;
+	tailEven = headEven;
+	while (p != NULL)
+	{
+		//奇数位置和偶数位置都采用尾插法，保持原有的次序
+		pOdd = (LinkList *)malloc(sizeof(LinkList));
+		pOdd->data = p->data;
+		tailOdd->next = pOdd;
+		tailOdd = pOdd;
+		p = p->next;
+		pEven = (LinkList *)malloc(sizeof(LinkList));
+		pEven->data = p->data;
+		tailEven->next = pEven;
+		tailEven = pEven;
+		p = p->next;
+	}
+	tailEven->next = NULL;
+	tailOdd->next = NULL;
+}
+/*C为一个单链表（a1,b1,a2,b2...），带头结点，设计一个就地算法，将其拆分为2个线性表,元素对应分离。A中按原顺序，B中按bn,bn-1,...b1形式存放*/
+void SeperateLinkListADscend(LinkList *head,LinkList *&headOdd,LinkList *&headEven)
+{
+	//奇数位置采用尾插法，偶数位置采用头插法建表
+	LinkList *p, *pOdd, *pEven, *tailOdd;
+	headOdd = (LinkList *)malloc(sizeof(LinkList));
+	tailOdd = headOdd;
+	headEven = (LinkList *)malloc(sizeof(LinkList));
+	headEven->next = NULL;
+	p = head->next;
+	while (p != NULL)
+	{
+		//尾插法建立奇数位置上的表
+		pOdd = (LinkList *)malloc(sizeof(LinkList));
+		pOdd->data = p->data;
+		tailOdd->next = pOdd;
+		tailOdd = pOdd;
+		p = p->next;
+	    //头插法建立偶数位置上的表
+		pEven = (LinkList *)malloc(sizeof(LinkList));
+		pEven->data = p->data;
+		pEven->next = headEven->next;
+		headEven->next = pEven;
+		p = p->next;
+	}
+	tailOdd->next = NULL;
+}
+/*设计一个算法，将不等长的两个线性表，在公共长度内交叉存储在一个新链表中，多余的挂载新链表的末尾*/
+void MergeDiffLengthLinkListDestroy(LinkList *headFirst, LinkList *headSecond, LinkList *&mergeLinkList)
+{
+	//破坏了原链表
+	LinkList *pfirst, *psecond, *pmergefirst,*pmergesecond, *tailmergelinklist;
+	pfirst = headFirst->next;
+	psecond = headSecond->next;
+	free(headSecond);
+	mergeLinkList = headFirst;
+	tailmergelinklist = mergeLinkList;
+	while (pfirst != NULL&&psecond != NULL)
+	{
+		tailmergelinklist->next = pfirst;
+		tailmergelinklist = pfirst;
+		pfirst = pfirst->next;
+	
+		tailmergelinklist->next = psecond;
+		tailmergelinklist = psecond;
+		psecond = psecond->next;
+	}
+	tailmergelinklist->next = NULL;
+	if (psecond != NULL) //说明表二长
+		pfirst = psecond;
+		tailmergelinklist->next = pfirst;	
+}
+/*设计一个算法，将不等长的两个线性表，在公共长度内交叉存储在一个新链表中，多余的挂载新链表的末尾*/
+void MergeDiffLengthLinkList(LinkList *headFirst, LinkList *headSecond, LinkList *&mergeLinkList)
+{
+	//没有破坏原链表
+	LinkList *pfirst, *psecond, *pmergefirst, *pmergesecond, *tailmergelinklist;
+	pfirst = headFirst->next;
+	psecond = headSecond->next;
+	mergeLinkList = (LinkList *)malloc(sizeof(LinkList));  //尾插法建立新表
+	tailmergelinklist = mergeLinkList;
+	while (pfirst != NULL&&psecond != NULL)
+	{
+		pmergefirst = (LinkList *)malloc(sizeof(LinkList));
+		pmergefirst->data = pfirst->data;
+		tailmergelinklist->next = pmergefirst;
+		tailmergelinklist = pmergefirst;
+		pfirst = pfirst->next;
+
+		pmergesecond= (LinkList *)malloc(sizeof(LinkList));
+		pmergesecond->data = psecond->data;
+		tailmergelinklist->next = pmergesecond;
+		tailmergelinklist = pmergesecond;
+		psecond = psecond->next;
+	}
+	if (psecond != NULL) pfirst = psecond;
+	while (pfirst != NULL)
+	{
+		pmergefirst = (LinkList *)malloc(sizeof(LinkList));
+		pmergefirst->data = pfirst->data;
+		tailmergelinklist->next = pmergefirst;
+		tailmergelinklist = pmergefirst;
+		pfirst = pfirst->next;
+	}
+	tailmergelinklist->next = NULL;
+}
+/*2-3-33删除带头结点的单链表中所有的奇数位置的节点*/
+void DeleteOddElement(LinkList *head)
+{
+	LinkList *pre, *p;
+	pre = head;
+	p = head->next;
+	while (p != NULL)
+	{
+		pre->next = p->next;
+		free(p);
+		pre = pre->next;
+		if (pre == NULL)  //指向了偶数号节点
+			break;
+		p = pre->next;
+	}
+}
+/*2-3-34在一个有序单链表中(升序)，插入一个元素x，使得插入后表仍有序*/
+void InsertElementAscend(LinkList *head,int x)
+{
+	LinkList *pre,*p,*node;
+	pre = head;
+	p = head->next;
+	while (p != NULL&&p->data < x)
+	{
+		pre = p;
+		p = p->next;
+	}	
+	node = (LinkList *)malloc(sizeof(LinkList));
+	node->data = x;
+	node->next = pre->next;
+	pre->next = node;
+}
+/*2-3-35有一个带头结点的单链表L，设计一个算法让其元素递增有序*/
+void SortLinkListAscend(LinkList *&head)
+{
+	//直接插入排序的链表实现
+	LinkList *p = head->next, *pre, *tail;
+	tail = p->next;
+	p->next = NULL;
+	p = tail;
+	while (p != NULL)
+	{
+		tail = p->next; //保存P节点的后继节点指针
+		pre = head;
+		while (pre->next != NULL&&pre->next->data < p->data)
+			pre = pre->next; //在有序表中插入元素的前驱节点
+		p->next = pre->next;
+		pre->next = p;
+		p = tail;
+	}
+}
+/*有一个递增单链表，设计算法删除data值位于所给区间之内的节点，同时释放节点空间*/
+void DeleteElementInRange(LinkList *head, int left, int right)
+{
+	LinkList *p,*pre,*pdel;
+	pre = head;
+	p = head->next;  //因为链表有序，所以先找到下界位置
+	while (p != NULL&&p->data<left)
+	{	
+		pre = p;
+		p = p->next;
+	}
+	while (p != NULL&&p->data <= right)
+	{
+		pdel = p->next;
+		free(p);
+		p = pdel;
+	}
+	pre->next = p; //终点位置也能删除
+}
+/*对于一个无序表，删除位于边界内的元素，包括边界*/
+void DeleteElementRandLinkListRange(LinkList *head, int left, int right)
+{
+	//删除无序表中的位于区间之内的元素，只能顺序遍历
+	LinkList *p,*pre,*post;
+	pre = head;
+	p = head->next;
+	while (p != NULL)
+	{
+		if (p->data >= left&&p->data <= right)
+		{
+			post = p->next;
+			pre->next = p->next;
+			free(p);
+			p = post;
+		}
+		else
+		{
+			pre = p;
+			p = p->next;
+		}
+	}
+}
+/*2-3-38设计一个算法，删除单链表中元素值重复的节点*/
+void DeleteSameElementRandomLinkList(LinkList *head)
+{
+	//删除无序表中元素值重复的节点
+	LinkList *p,*q,*post,*pre;
+	p = head->next;
+	pre = head;
+	while (p != NULL)
+	{
+		q = p->next;
+		while (q != NULL)
+		{
+			if (q->data == p->data)
+			{
+				post = q->next;
+				pre->next = q->next;
+				free(q);
+				q = post;
+			}
+			else
+			{
+				pre = q;
+				q = q->next;
+			}
+		}
+		p = p->next;
+	}
+}
+/*2-3-39有一个递增单链表，删除单链表中元素值重复的节点*/
+void DeleteSameElementsAscendLinkList(LinkList *head)
+{
+	//删除有序单链表中的重复元素,必定相邻
+	LinkList *p, *q;
+	p = head->next;
+	while (p->next != NULL)
+	{
+		if (p->data == p->next->data)
+		{
+			q = p->next;
+			p->next = q->next;
+			free(q);
+		}
+		else
+			p = p->next;
+	}
+}
+/*2-3-40用单链表表示集合，设计一个算法求两个集合的交集*/
+void OccurSimultaneousDis(LinkList *headfirst, LinkList *headsecond, LinkList *&OccurSim)
+{
+	//无序链表中的交集
+	LinkList *pfirst, *psecond, *pOccurSim, *tailOccurSim;
+	OccurSim = (LinkList *)malloc(sizeof(LinkList));
+	tailOccurSim = OccurSim;
+	pfirst = headfirst->next;
+	while (pfirst != NULL)
+	{
+		psecond = headsecond->next;
+		while (psecond != NULL&&psecond->data != pfirst->data)
+			psecond = psecond->next;
+		if (psecond != NULL)
+		{
+			pOccurSim = (LinkList *)malloc(sizeof(LinkList));
+			pOccurSim->data = pfirst->data;
+			tailOccurSim->next = pOccurSim;
+			tailOccurSim = pOccurSim;
+		}
+		pfirst = pfirst->next;
+	}
+	tailOccurSim->next = NULL;
+}
+/*2-3-41用单链表表示集合，单链表递增有序，设计一个算法求两个集合的交集*/
+void OccurSimultaneousAscend(LinkList *headfirst, LinkList *headsecond, LinkList *&OccurSim)
+{
+	//有序链表中的交集
+	LinkList *pfirst, *psecond, *pOccurSim,*tailOccurSim;
+	OccurSim = (LinkList *)malloc(sizeof(LinkList));
+	tailOccurSim = OccurSim;
+	pfirst = headfirst->next;
+	psecond = headsecond->next;
+	while (pfirst != NULL&&psecond != NULL)
+	{
+		if (pfirst->data < psecond->data)
+			pfirst = pfirst->next;
+		else if (pfirst->data > psecond->data)
+			psecond = psecond->next;
+		else
+		{
+			pOccurSim = (LinkList *)malloc(sizeof(LinkList));
+			pOccurSim->data = pfirst->data;
+			tailOccurSim->next = pOccurSim;
+			tailOccurSim = pOccurSim;
+			pfirst = pfirst->next;
+			psecond = psecond->next;
+		}
+	}
+	tailOccurSim->next = NULL;
+}
+/*2-3-42用单链表表示集合，设计一个算法求两个集合的差集*/
+void SubLinkListDis(LinkList *headfirst, LinkList *headsecond, LinkList *&Sublist)
+{
+
+}
+/*2-3-43用单链表表示集合，单链表递增有序，设计一个算法求两个集合的差集*/
+void SubLinkListAscend(LinkList *headfirst, LinkList *headsecond, LinkList *&Sublist)
+{
+
+}
+/*2-3-44用单链表表示集合，设计一个算法求两个集合的并集*/
+void UnionLinkListDis(LinkList *headfirst, LinkList *headsecond, LinkList *&Unionlist)
+{
+
+}
+/*2-3-45用单链表表示集合，单链表递增有序，设计一个算法求两个集合的并集*/
+void UnionLinkListAscend(LinkList *headfirst, LinkList *headsecond, LinkList *&Unionlist)
+{
+
+}
+/*2-3-46*/
+
+
+/*2-3-47*/
+
+
+/*2-3-48*/
+
+
+
+int main()
+{
+	int Element[10] = {14,75,3,4,21,6,7,8,9,10 };
+	int Element2[12] = {45,12,14,18,47,74,11,22,3,33,55,78 };
+	int Element3[10] = {1,5,7,45,78,85,99,100,105,120 };
+	int Element4[15] = {22,14,54,87,78,87,8,7,87,99,8,7,14,54,45};
+	int Element5[15] = {1,22,45,37,48,87,8,7,14,44,32,21,17,17,28};
+	int Element6[15] = {22,45,78,78,99,100,110,110,110,124,125,126,126,126,126 };
+	int Element7[15] = {22,33,78,88,99,100,110,111,114,124,125,126,128,128,130};
+	LinkList *L,*L2,*localinversion,*headEven,*headOdd,*mergelist;
+	//头插法建表
+	//cout << "头插法建表" << endl;
+	//CreateLinklistInHEAD(L, Element, 10);
+	//输出头插法表
+	//cout << "输出头插法建表" << endl;
+	//PrintLinkList(L);
+	//删除单链表中第一个值为x的节点算法测试
+	//DeleteFirstElement_x(L, 8);
+	//输出删除单链表中第一个值为x的节点后的表
+	//cout << "输出删除单链表中第一个值为x的节点表" << endl;
+	//PrintLinkList(L);
+	//删除单链表中第一个值为x的节点的前一个元素
+	//DeleteElementBefore_x(L, 5);
+	//cout << "删除单链表中第一个值为x的节点的前一个元素算法测试" << endl;
+	//PrintLinkList(L);
+	//判断链表中的元素是否是升序
+	//cout << "判断链表中的元素是否是升序" << endl;
+	//JudgeLinkListIsAscend(L);
+	//删除最小节点
+	//cout << "删除表中的最小节点" << endl;
+	//DeleteSamllestElement(L);
+	//PrintLinkList(L);
+	//头插法将链表逆置
+	//cout << "头插法将链表逆置" << endl;
+	//LocalInversionSolu1(localinversion,L);
+	//PrintLinkList(localinversion);
+
+	//LocalInversionSolu2(L);
+	//PrintLinkList(L);
+	//DestroyLinkList(localinversion);
+	//将表中的数据按就奇偶性分开
+	//SeperateLinkListByOdd_Even(L, headEven);
+	//输出奇数表
+	//cout << "输出奇数表" << endl;
+	//PrintLinkList(L);
+	//输出偶数表
+	//cout << "输出偶数表" << endl;
+	//PrintLinkList(headEven);
+	//输出按位置分离的奇偶数表
+	//SeperateLinkList(L, headOdd, headEven);
+	//cout << "奇数位置" << endl;
+	//PrintLinkList(headOdd);
+	//cout << "偶数位置" << endl;
+	//PrintLinkList(headEven);
+	//输出奇数位置顺序不变，偶数位置逆序的表
+	//SeperateLinkListADscend(L, headOdd, headEven);
+	//cout << "奇数位置" << endl;
+	//PrintLinkList(headOdd);
+	//cout << "偶数位置" << endl;
+	//PrintLinkList(headEven);
+	//输出不等长表的合并表
+	//CreateLinklistInHEAD(L2, Element2, 12);
+	//PrintLinkList(L2);
+	//MergeDiffLengthLinkListDestroy(L, L2, mergelist);
+	//PrintLinkList(mergelist);
+	//cout << "销毁表1" << endl;
+	//MergeDiffLengthLinkList(L, L2, mergelist);
+	//PrintLinkList(mergelist);
+	//DeleteOddElement(L);
+	//PrintLinkList(L);
+	//DestroyLinkList(L);
+	//cout << "销毁表二" << endl;
+	//DestroyLinkList(L2);
+	//cout << "销毁合并表" << endl;
+	//DestroyLinkList(mergelist);
+	//DestroyLinkList(headEven);
+	//DestroyLinkList(headOdd);
+	//CreateLinklistInTAIL(L, Element3, 10);
+	//cout << "升序表" << endl;
+	//PrintLinkList(L);
+	//cout << "插入元素之后的有序表" << endl;
+	//InsertElementAscend(L, 20);
+	//CreateLinklistInHEAD(L, Element, 10);
+	//CreateLinklistInTAIL(L, Element4, 15);
+	//PrintLinkList(L);
+	//DeleteElementInRange(L, 20, 120);
+	//DeleteElementRandLinkListRange(L, 20, 80);
+	//DeleteSameElementRandomLinkList(L);
+	CreateLinklistInTAIL(L, Element4, 15);
+	CreateLinklistInTAIL(L2, Element5, 15);
+	PrintLinkList(L);
+	PrintLinkList(L2); 
+	//DeleteSameElementsAscendLinkList(L);
+	//OccurSimultaneousAscend(L, L2, mergelist);
+	//PrintLinkList(mergelist);
+	//SortLinkListAscend(L);
+	//PrintLinkList(L);
+
+	OccurSimultaneousDis(L, L2, mergelist);
+	PrintLinkList(mergelist);
+	DestroyLinkList(L);
+	DestroyLinkList(L2);
+	DestroyLinkList(mergelist);
+	system("pause");
+	return 0;
+}
