@@ -1,0 +1,207 @@
+//单链表的基本算法实现
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct LNode
+{
+	ElementType data;
+	struct LNode *next;
+}LinkList;
+//尾插法建表
+void CreateLinklistInTAIL(LinkList *&head, ElementType array[], int n)
+{
+	LinkList *tail, *p;
+	head = (LinkList *)malloc(sizeof(LinkList));
+	tail = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (LinkList *)malloc(sizeof(LinkList));
+		p->data = array[i];
+		tail->next = p;
+		tail = p;
+	}
+	tail->next = NULL;
+}
+//输出链表
+void PrintLinkList(LinkList *head)
+{
+	LinkList* p;
+	p = head->next;
+	while (p != NULL)
+	{
+		cout << p->data << "->";
+		p = p->next;
+	}
+	cout << endl;
+}
+//有序单链表的归并算法,通过复制
+void MergeLinkListCopy(LinkList *&headNew, LinkList *headFirst, LinkList *headSecond)
+{
+	LinkList *p, *q,*headNewTail,*node;
+	headNew = (LinkList *)malloc(sizeof(LinkList));
+	headNewTail = headNew;
+	p = headFirst->next;
+	q = headSecond->next;
+	while (p != NULL&&q != NULL)
+	{
+		if (p->data < q->data)
+		{
+			node = (LinkList *)malloc(sizeof(LinkList));
+			node->data = p->data;
+			headNewTail->next = node;
+			headNewTail = node;
+			p = p->next;
+		}
+		else if (p->data > q->data)
+		{
+			node = (LinkList *)malloc(sizeof(LinkList));
+			node->data = q->data;
+			headNewTail->next = node;
+			headNewTail = node;
+			q = q->next;
+		}
+		else
+		{
+			node = (LinkList *)malloc(sizeof(LinkList));
+			node->data = p->data;
+			headNewTail->next = node;
+			headNewTail = node;
+			p = p->next;
+			q = q->next;
+		}
+	}
+	//处理剩下的节点
+	while (p != NULL)
+	{
+		node = (LinkList *)malloc(sizeof(LinkList));
+		node->data = p->data;
+		headNewTail->next = node;
+		headNewTail = node;
+		p = p->next;
+	}
+	while (q != NULL)
+	{
+		node = (LinkList *)malloc(sizeof(LinkList));
+		node->data = q->data;
+		headNewTail->next = node;
+		headNewTail = node;
+		q = q->next;
+	}
+	headNewTail->next = NULL;
+}
+//有序单链表的归并算法,通过原有链表重组
+void MergeLinkListReStruct(LinkList *&headNew, LinkList *headFirst, LinkList *headSecond)
+{
+	LinkList *p, *q, *headNewTail, *node,*freenode;
+	headNew = (LinkList *)malloc(sizeof(LinkList));
+	headNew = headFirst;
+	free(headSecond);
+	headNewTail = headNew;
+	p = headFirst->next;
+	q = headSecond->next;
+	while (p != NULL&&q != NULL)
+	{
+		if (p->data < q->data)
+		{
+			headNewTail->next = p;
+			headNewTail = p;
+			p = p->next;
+		}
+		else if (p->data > q->data)
+		{
+			headNewTail->next = q;
+			headNewTail = q;
+			q = q->next;
+		}
+		else
+		{
+			headNewTail->next = p;
+			headNewTail = p;
+			p = p->next;
+			freenode = q;
+			q = q->next;
+			free(freenode);
+		}
+	}
+	//处理剩下的节点
+	while (p != NULL)
+	{
+		headNewTail->next = p;
+		headNewTail = p;
+		p = p->next;
+	}
+	while (q != NULL)
+	{
+		headNewTail->next = q;
+		headNewTail = q;
+		q = q->next;
+	}
+	headNewTail->next = NULL;
+}
+//在给定元素后面插入新元素
+void InsertAfterElement(LinkList *head, ElementType e, int data)
+{
+	LinkList *p,*node;
+	p = head->next;
+	while (p != NULL&&p->data != e)
+		p = p->next;
+	if (p != NULL)  //说明找到了
+	{
+		node = (LinkList *)malloc(sizeof(LinkList));
+		node->data = data;
+		node->next = p->next;
+		p->next = node;
+	}
+	else
+		cout << "元素不存在" << endl;
+}
+//销毁链表中的每个元素
+void DestroyLinkList(LinkList *head)
+{
+	LinkList *pre, *p;
+	p = head->next;
+	while (p != NULL)
+	{
+		pre = p;
+		cout << "释放" << p->data << " ";
+		p = p->next;
+		free(pre);
+	}
+	cout << "释放头结点" << endl;
+	free(head);
+}
+int main()
+{
+	LinkList *headfirst,*headsecond,*headmerge;
+	int Elementfirst[10] = { 1,12,14,45,47,65,98,100,101,140 }, pos;
+	int Elementsecond[15] = { 1,3,5,6,8,68,72,78,84,97,147,152,160,168,178 };
+	//建立第一个有序表
+	CreateLinklistInTAIL(headfirst, Elementfirst, 10);
+	cout << "尾插法建表结果" << endl;
+	PrintLinkList(headfirst);
+
+	//建立第二个有序表
+	CreateLinklistInTAIL(headsecond, Elementsecond, 15);
+	cout << "尾插法建表结果" << endl;
+	PrintLinkList(headsecond);
+	//合并有序表
+	cout << "复制法合并两个有序表" << endl;
+	MergeLinkListCopy(headmerge, headfirst, headsecond);
+	PrintLinkList(headmerge);
+
+	cout << "重组法合并两个有序表" << endl;
+	MergeLinkListCopy(headmerge, headfirst, headsecond);
+	PrintLinkList(headmerge);
+
+	//在合并后的有序表标中插入元素
+	cout << "在合并后的有序表标中插入元素" << endl;
+	InsertAfterElement(headmerge, 68, 444);
+	PrintLinkList(headmerge);
+	cout << "销毁单链表" << endl;
+	//DestroyLinkList(headfirst);
+	//DestroyLinkList(headsecond);
+	DestroyLinkList(headmerge);
+	system("pause");
+	return 0;
+}
