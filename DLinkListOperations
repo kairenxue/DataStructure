@@ -1,0 +1,276 @@
+/*带头结点的双链表的基本算法*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct DLinkList
+{
+	int data;
+	struct DLinkList *prior;
+	struct DLinkList *next;
+}DLinkList;
+/*头插法建立双链表*/
+void CreateDLinkListHEAD(DLinkList *&head, ElementType array[], int n)
+{
+	//思路同单链表
+	DLinkList *p;
+	head = (DLinkList *)malloc(sizeof(DLinkList));
+	head->prior = head->next = NULL; //与单链表相比，多了一个指向前驱的指针。
+	for (int i = 0; i < n; i++)
+	{
+		p = (DLinkList *)malloc(sizeof(DLinkList));
+		p->data = array[i];
+		p->next = head->next;
+		if (head->next != NULL)
+			head->next->prior = p;
+		p->prior = head;
+		head->next = p;
+	}
+}
+/*尾插法建立双链表*/
+void CreateDLinkListTAIL(DLinkList *&head, ElementType array[], int n)
+{
+	DLinkList *p, *tail;
+	head = (DLinkList *)malloc(sizeof(DLinkList));
+	tail = head;  //做法同单链表
+	for (int i = 0; i < n; i++)
+	{
+		p = (DLinkList *)malloc(sizeof(DLinkList));
+		p->data = array[i];
+		p->prior = tail;
+		tail->next = p;  //三步就行
+		p->prior = tail;
+		tail = p;
+	}
+	tail->next = NULL; //顺便完成了对尾结点的赋值
+}
+/*查找指定元素值的节点*/
+void SearchElement(DLinkList *head, ElementType x)
+{
+	DLinkList *p;
+	p = head->next;
+	while (p != NULL&&p->data != x)
+		p = p->next;
+	if (p != NULL)
+		cout << "找到" << p->data << endl;
+	else
+		cout << "不存在值为" << x << "的节点" << endl;
+	return;
+}
+/*节点x之后插入元素操作*/
+void InsertElementAfter(DLinkList *head, ElementType x, int data)
+{
+	DLinkList *p, *node;
+	p = head->next;
+	while (p != NULL&&p->data != x)
+		p = p->next;
+	if (p != NULL)
+	{
+		if (p->next != NULL) //节点x的后继不为空
+		{
+			node = (DLinkList *)malloc(sizeof(DLinkList));
+			node->data = data;
+			node->next = p->next;
+			p->next->prior = node;
+			node->prior = p;
+			p->next = node;
+		}
+		else //节点x没有后继
+		{
+			node = (DLinkList *)malloc(sizeof(DLinkList));
+			node->data = data;
+			node->next = NULL;
+			node->prior = p;
+			p->next = node;
+		}
+	}
+	else
+		cout << "不存在这样的节点" << x << endl;
+}
+/*节点x之前插入元素*/
+void InsertElementBefore(DLinkList *head, ElementType x, int data)
+{
+	DLinkList *p, *node;
+	p = head->next;
+	while (p != NULL&&p->data != x)
+		p = p->next;
+	if (p != NULL)  //说明找到了x
+	{
+		node = (DLinkList *)malloc(sizeof(DLinkList));
+		node->data = data;
+		node->prior = p->prior;
+		node->next = p;
+		p->prior->next = node;
+		p->prior = node;
+	}
+	else
+		cout << "不存在这样的节点" << x << endl;
+}
+/*指定第i个位置上插入元素*/
+void InsertElementInPos(DLinkList *head, int pos, int data)
+{
+	DLinkList *p, *node;
+	int n;
+	p = head->next;
+	for (n = 1, p = head->next; (n < pos-1)&&p != NULL; n++, p = p->next);
+	if (p != NULL)
+	{
+		if (p->next != NULL) //节点x的后继不为空
+		{
+			node = (DLinkList *)malloc(sizeof(DLinkList));
+			node->data = data;
+			node->next = p->next;
+			p->next->prior = node;
+			node->prior = p;
+			p->next = node;
+		}
+		else //节点x没有后继
+		{
+			node = (DLinkList *)malloc(sizeof(DLinkList));
+			node->data = data;
+			node->next = NULL;
+			node->prior = p;
+			p->next = node;
+		}
+	}
+	else
+		cout << "不存在这样的位置"<< endl;
+}
+/*删除节点x后面的节点*/
+void DeleteElementAfter(DLinkList *head, ElementType x)
+{
+	DLinkList *p,*q, *node;
+	p = head->next;
+	while (p != NULL&&p->data != x)
+		p = p->next;
+	if (p != NULL)
+	{
+		if (p->next == NULL) //节点x的后继不为空
+			cout << "后面没有元素，不用删除" << endl;
+		else //说明待删节点后面不为空
+		{
+			if (p->next->next != NULL) //待删节点后面的节点不空
+			{
+				q = p->next;
+				p->next->next->prior = p;
+				p->next = p->next->next;
+				free(q);
+			}
+			else  //说明待删节点已经是最后一个节点
+			{
+				q = p->next;
+				p->next = NULL;
+				free(q);
+			}
+		}
+	}
+	else
+		cout << "不存在这样的节点" << x << endl;
+}
+/*删除节点x之前的节点*/
+void DeleteElementBefore(DLinkList *head, ElementType x)
+{
+	DLinkList *p,*q, *node;
+	p = head->next;
+	while (p != NULL&&p->data != x)
+		p = p->next;
+	if (p != NULL)
+	{
+		if (p->prior == head)
+			cout << "无法删除头结点" << endl;
+		else
+		{
+			q = p->prior;
+			p->prior->prior->next = p;
+			p->prior = p->prior->prior;
+		}
+	}
+	else
+		cout << "不存在这样的节点" << x << endl;
+}
+/*删除第i个位置上的节点*/
+void DeleteElementInPos(DLinkList *head, int pos)
+{
+	DLinkList *p,*q, *node;
+	int n;
+	p = head->next;
+	for (n = 1, p = head->next; n < pos && p != NULL; n++, p = p->next);
+	if (p != NULL)
+	{
+		if (p->next != NULL)
+		{
+			p->prior->next = p->next;
+			p->next->prior = p->prior;
+			free(p);
+		}
+		else
+		{
+			p->prior->next = NULL;
+			free(p);
+		}
+	}
+	else
+		cout << "不存在这样的位置" << endl;
+}
+/*输出双链表*/
+void PrintDLinkList(DLinkList *head)
+{
+	DLinkList *p;
+	p = head->next;
+	while (p != NULL)
+	{
+		cout << p->data << "->";
+		p = p->next;
+	}
+	cout << endl;
+}
+/*销毁双链表*/
+void DestroyDLinkList(DLinkList *head)
+{
+	DLinkList *p, *post;
+	p = head->next;
+	post = NULL;
+	while (p != NULL)
+	{
+		post = p->next;
+		cout << "释放" << p->data << " ";
+		free(p);
+		p = post;
+	}
+}
+int main()
+{
+	DLinkList *L,*L2;
+	int Element[10] = { 22,14,45,47,41,10,1,23,54,55 };
+	cout << "头插法建立双链表" << endl;
+	CreateDLinkListHEAD(L, Element, 10);
+	PrintDLinkList(L);
+	cout << "尾插法建立双链表" << endl;
+	CreateDLinkListTAIL(L2, Element, 10);
+	PrintDLinkList(L2);
+	cout << "查找元素47" << endl;
+	SearchElement(L, 47);
+	cout << "节点47之后插入元素100" << endl;
+	InsertElementAfter(L, 47, 100);
+	PrintDLinkList(L);
+	cout << "节点41之前插入元素30" << endl; 
+	InsertElementBefore(L, 41, 30);
+	PrintDLinkList(L);
+	cout << "第六个位置上插入元素88" << endl;
+	InsertElementInPos(L, 6, 88);
+	PrintDLinkList(L);
+	cout << "删除1后面的节点" << endl;
+	DeleteElementAfter(L, 1);
+	PrintDLinkList(L);
+	cout << "删除45之前的节点" << endl;
+	DeleteElementBefore(L, 45);
+	PrintDLinkList(L);
+	cout << "删除第3个位置上的节点" << endl;
+	DeleteElementInPos(L, 3);
+	PrintDLinkList(L);
+	cout << "销毁双链表" << endl;
+	DestroyDLinkList(L);
+	DestroyDLinkList(L2);
+	system("pause");
+	return 0;
+}
