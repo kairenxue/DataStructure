@@ -1,0 +1,202 @@
+/*双链表的附加算法练习*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct DLinkList
+{
+	int data;
+	struct DLinkList *prior;
+	struct DLinkList *next;
+}DLinkList;
+/*头插法建立双链表*/
+void CreateDLinkListHEAD(DLinkList *&head, ElementType array[], int n)
+{
+	//思路同单链表
+	DLinkList *p;
+	head = (DLinkList *)malloc(sizeof(DLinkList));
+	head->prior = head->next = NULL; //与单链表相比，多了一个指向前驱的指针。
+	for (int i = 0; i < n; i++)
+	{
+		p = (DLinkList *)malloc(sizeof(DLinkList));
+		p->data = array[i];
+		p->next = head->next;
+		if (head->next != NULL)
+			head->next->prior = p;
+		p->prior = head;
+		head->next = p;
+	}
+}
+/*尾插法建立双链表*/
+void CreateDLinkListTAIL(DLinkList *&head, ElementType array[], int n)
+{
+	DLinkList *p, *tail;
+	head = (DLinkList *)malloc(sizeof(DLinkList));
+	tail = head;  //做法同单链表
+	for (int i = 0; i < n; i++)
+	{
+		p = (DLinkList *)malloc(sizeof(DLinkList));
+		p->data = array[i];
+		p->prior = tail;
+		tail->next = p;  //三步就行
+		p->prior = tail;
+		tail = p;
+	}
+	tail->next = NULL; //顺便完成了对尾结点的赋值
+}
+/*真交换：查找第一个元素为x的节点，并将其余后继节点交换*/
+void SwapElementBelowTrue(DLinkList *head, ElementType x)
+{
+	//首先找到第一个值为x的节点，然后将其从表中删除，再把它插到它原来的后继节点的后面，完成交换。
+	DLinkList *p,*post;
+	p = head->next;
+	while (p != NULL&&p->data != x)
+		p = p->next;
+	if (p == NULL)
+		return ;
+	else
+	{
+		post = p->next; //暂存后继节点
+		if (post != NULL)
+		{
+			p->prior->next = post;
+			post->prior = p->prior;
+
+			p->next = post->next;
+			p->prior = post;
+			if(post->next!=NULL)
+				post->next = p;
+			post->next->prior = p;
+		}
+	}
+}
+/*假交换：查找第一个元素为x的节点，并将其余后继节点交换，交换信息即可*/
+void SwapElementBelowFalse(DLinkList *head, ElementType x)
+{
+	DLinkList *p, *post;
+	ElementType temp;
+	p = head->next;
+	while (p != NULL&&p->data != x)
+		p = p->next;
+	if (p == NULL)
+		return;
+	else
+	{
+		post = p->next; //暂存后继节点
+		if (post != NULL)
+		{
+			temp = p->data;
+			p->data = post->data;
+			post->data = temp;
+		}
+	}
+}
+/*删除无序双链表中最大值的节点*/
+void DeleteBiggestElement(DLinkList *head)
+{
+	DLinkList *p, *pmax;
+	p = head->next;
+	pmax = p;
+	while (p != NULL)
+	{
+		if (p->data > pmax->data)
+			pmax = p;
+		p = p->next;
+	}
+	cout << "找到最大元素" << pmax->data << endl;
+	//考虑这个最大值节点是否是最后一个节点
+	if(pmax->next!=NULL)
+		pmax->next->prior = pmax->prior;
+	pmax->prior->next = pmax->next;
+	free(pmax);
+}
+/*设计一个算法将双链表中的节点逆置*/
+void ReverseDLinkList(DLinkList *&head)
+{
+	//头插法建表
+	DLinkList *p,*post;
+	p = head->next; //从第一个元素开始起
+	head->next = head->prior = NULL; //初始化为空表
+	while (p != NULL)
+	{
+		post = p->next;
+		p->next = head->next;
+		p->prior = head;
+		if (head->next != NULL)
+			head->next->prior = p;
+		head->next = p;
+		p = post;
+	}
+}
+/*指针翻转实现双链表的逆置*/
+void ReversePointer(DLinkList *&head)
+{
+	DLinkList *pre, *p,*post;
+	pre = head->next;
+	p = pre->next;
+	pre->next = NULL; 
+	head->next = head->prior = NULL;  //摘掉头结点
+	while (p != NULL)
+	{	
+		post = p->next;
+		pre->prior = p;
+		p->next = pre;	
+		pre = p;	
+		p = post;
+	}
+	head->next = pre;
+}
+/*输出双链表*/
+void PrintDLinkList(DLinkList *head)
+{
+	DLinkList *p;
+	p = head->next;
+	while (p != NULL)
+	{
+		cout << p->data << "->";
+		p = p->next;
+	}
+	cout << endl;
+}
+/*销毁双链表*/
+void DestroyDLinkList(DLinkList *head)
+{
+	DLinkList *p, *post;
+	p = head->next;
+	post = NULL;
+	while (p != NULL)
+	{
+		post = p->next;
+		cout << "释放" << p->data << " ";
+		free(p);
+		p = post;
+	}
+	cout << endl;
+}
+int main()
+{
+	DLinkList *L;
+	int Element[10] = { 10,14,45,47,50,19,11,23,54,55 };
+	cout << "尾插法建立双链表" << endl;
+	CreateDLinkListTAIL(L, Element, 10);
+	PrintDLinkList(L);
+	//cout << "真交换45和他后面的节点" << endl;
+	//SwapElementBelowTrue(L, 45);
+	//PrintDLinkList(L);
+	//cout << "假交换10和他后面的节点" << endl;
+	//SwapElementBelowTrue(L, 10);
+	//PrintDLinkList(L);
+	//cout << "删除双向链表中的最大值节点" << endl;
+	//DeleteBiggestElement(L);
+	//PrintDLinkList(L);
+	//cout << "头插法O(1)空间复杂度逆置双链表" << endl;
+	//ReverseDLinkList(L);
+	//PrintDLinkList(L);
+	cout << "指针翻转实现逆置双链表" << endl;
+	ReversePointer(L);
+	PrintDLinkList(L);
+	cout << "释放双链表" << endl;
+	DestroyDLinkList(L);
+	system("pause");
+	return 0;
+}
