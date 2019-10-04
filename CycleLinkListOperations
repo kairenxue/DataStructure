@@ -1,0 +1,239 @@
+/*循环单链表基本算法*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct LNode
+{
+	ElementType data;
+	struct LNode *next;
+}LinkList;
+/*头插法建立循环单链表*/
+void CreateCycleLinkListHEAD(LinkList *&head, ElementType array[], int n)
+{
+	LinkList *p;
+	head = (LinkList *)malloc(sizeof(LinkList));
+	head->next = head;  //循环单链表初始表空
+	for (int i = 0; i < n; i++)
+	{
+		p = (LinkList *)malloc(sizeof(LinkList));
+		p->data = array[i];
+		p->next = head->next;
+		head->next = p;
+	}
+}
+/*尾插法建立循环单链表*/
+void CreateCycleLinkListTAIL(LinkList *&head, ElementType array[], int n)
+{
+	LinkList *p,*tail;
+	head = (LinkList *)malloc(sizeof(LinkList));
+	tail = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (LinkList *)malloc(sizeof(LinkList));
+		p->data = array[i];
+		tail->next = p;
+		tail = p;
+	}
+	tail->next = head;  //与单链表不同的是，这里指向了头结点
+}            
+/*在循环单链表中查找元素值为x的节点*/
+void FindElement(LinkList *head,int x)
+{
+	LinkList *p;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+		cout << "找到指定的节点" << endl;
+	else
+		cout << "不存在这样的节点" << endl;
+}
+/*在循环单链表中节点x之后插入节点*/
+void InsertElementAfterX(LinkList *head,int x,ElementType data)
+{
+	LinkList *p, *node;
+	p = head->next;
+	while (p != head&&p->data != x) //找到x节点
+		p = p->next;
+	node = (LinkList *)malloc(sizeof(LinkList));
+	node->data = data;
+	node->next = p->next;
+	p->next = node;
+}
+/*在循环单链表中节点x之前插入节点*/
+void InsertElementBeforeX(LinkList *head, int x, ElementType data)
+{
+	LinkList *pre, *p,*node;
+	pre = head;
+	p = head->next;
+	while (p != head&&p->data != x)
+	{
+		pre = p;
+		p = p->next;
+	}
+	if (p != head)
+	{
+		node = (LinkList *)malloc(sizeof(LinkList));
+		node->data = data;
+		node->next = pre->next;
+		pre->next = node;
+	}
+	else
+		cout << "不存在元素" << data << endl;
+}
+/*在循环单链表中第i个位置插入节点*/
+void InsertElementInPos(LinkList *head, int pos, ElementType data)
+{
+	LinkList *p, *node;
+	int i;
+	for (i = 1, p = head->next; i < pos - 1; i++, p = p->next);	
+	node = (LinkList *)malloc(sizeof(LinkList));
+	node->data = data;
+	node->next = p->next;
+	p->next = node;
+}
+/*在循环单链表中删除元素值为x的节点*/
+void DeleteElement(LinkList *head,int x)
+{
+	LinkList *pre, *p, *node;
+	pre = head;
+	p = head->next;
+	while (p != head&&p->data != x)
+	{
+		pre = p;
+		p = p->next;
+	}
+	if (p != head)
+	{
+		pre->next = p->next;
+		free(p);
+	}
+	else
+		cout << "不存在元素" << x << endl;
+}
+/*在循环单链表中删除元素值为x的前驱节点*/
+void DeleteElementBefore(LinkList *head, int x)
+{
+	LinkList *prepre,*pre, *p, *node;
+	prepre = head;
+	pre = head->next;
+	p = pre->next;
+	while (p != head&&p->data != x)
+	{
+		prepre = pre;
+		pre = p;
+		p = p->next;
+	}
+	if (p != head)
+	{
+		prepre->next = pre->next;
+		free(pre);
+	}
+	else
+		cout << "不存在节点" << endl;
+}
+/*在循环单链表中删除元素值为x的后继节点*/
+void DeleteElementAfter(LinkList *head, int x)
+{
+	LinkList *p,*q,*node;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+	{
+		if (p->next != head)
+		{
+			q = p->next;
+			p->next = q->next;
+			free(q);
+		}
+	}
+	else
+		cout << "不存在节点" << x << endl;	
+}
+/*在循环单链表中删除指定位置上的节点*/
+void DeleteElementInPos(LinkList *head, int pos)
+{
+	LinkList *pre, *p, *node;
+	pre = head;
+	p = head->next;
+	int i;
+	for (i = 1, p = head->next; i < pos; i++, pre = p, p = p->next);
+	pre->next = p->next;
+	free(p);
+}
+/*输出循环单链表*/
+void PrintCycleLinkList(LinkList *head)
+{
+	LinkList *p;
+	p = head->next;
+	while (p != head)
+	{
+		cout << p->data << " ";
+		p = p->next;
+	}
+	cout << endl;
+}
+/*销毁循环单链表*/
+void DestroyCycleLinkList(LinkList *head)
+{
+	LinkList *p,*post;
+	p = head->next;
+	while (p != head)
+	{
+		post = p->next;
+		cout << "释放" <<p->data<<" ";
+		free(p);
+		p = post;
+	}
+	cout << endl;
+}
+int main()
+{
+	int Element[10] = { 22,14,45,47,41,10,1,23,54,55 };
+	LinkList *L;
+	CreateCycleLinkListHEAD(L, Element, 10);
+	cout <<"头插法建立循环单链表" << endl;
+	PrintCycleLinkList(L);
+
+	/*CreateCycleLinkListTAIL(L, Element, 10);
+	cout << "尾插法建立循环单链表" << endl;
+	PrintCycleLinkList(L);*/
+
+	/*cout << "在循环链表中查找元素47"<< endl;
+	FindElement(L, 47);*/
+
+	//InsertElementAfterX(L, 1, 220);
+	//cout << "在元素1之后插入220" << endl;
+	//PrintCycleLinkList(L);
+
+	/*InsertElementBeforeX(L, 23, 78);
+	cout << "在元素23之前插入78" << endl;
+	PrintCycleLinkList(L);*/
+
+	/*InsertElementInPos(L, 8, 140);
+	cout << "在第8个位置上插入140" << endl;
+	PrintCycleLinkList(L);*/
+
+	/*DeleteElement(L, 54);
+	cout << "删除元素54" << endl;
+	PrintCycleLinkList(L);*/
+
+	//DeleteElementBefore(L, 47);
+	//cout << "删除元素47之前的元素" << endl;
+	//PrintCycleLinkList(L);
+
+	/*DeleteElementAfter(L, 47);
+	cout << "删除元素47之后的元素" << endl;
+	PrintCycleLinkList(L);
+*/
+	/*DeleteElementInPos(L, 5);
+	cout << "删除第5个位置上的元素" << endl;
+	PrintCycleLinkList(L);*/
+
+	cout << "销毁循环单链表" << endl;
+	DestroyCycleLinkList(L);	
+	system("pause");
+	return 0;
+}
