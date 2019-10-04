@@ -1,0 +1,256 @@
+/*循环双链表基本算法*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct CycleDLinkList
+{
+	ElementType data;
+	struct CycleDLinkList *prior;
+	struct CycleDLinkList *next;
+}CDLinkList;
+/*头插法创建循环双链表*/
+void CreateCycleDLinkListHead(CDLinkList *&head, ElementType array[], int n)
+{
+	CDLinkList *p;
+	head = (CDLinkList *)malloc(sizeof(CDLinkList));
+	head->next = head->prior = head;/*置为空表*/
+	for (int i = 0; i < n; i++)
+	{
+		p = (CDLinkList *)malloc(sizeof(CDLinkList));
+		p->data = array[i];
+		p->next = head->next;
+		p->prior = head;
+		if (head->next != head)
+			head->next->prior = p;
+		head->next = p;
+	}
+}
+/*尾插法创建循环双链表*/
+void CreateCycleDLinkListTail(CDLinkList *&head, ElementType array[], int n)
+{
+	CDLinkList *p, *tail;
+	head = (CDLinkList *)malloc(sizeof(CDLinkList));
+	tail = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (CDLinkList *)malloc(sizeof(CDLinkList));
+		p->data = array[i];
+		p->prior = tail;
+		tail->next = p;
+		tail = p;
+	}
+	tail->next = head;   //仅在此处和双链表有区别
+	head->prior = tail;
+}
+/*删除元素x*/
+void DeleteElement(CDLinkList *head, int x)
+{
+	CDLinkList *p;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+	{
+		p->next->prior = p->prior;
+		p->prior->next = p->next;
+		free(p);
+	}
+}
+/*删除元素x之前的前驱*/
+void DeleteElementBefore(CDLinkList *head, int x)
+{
+	CDLinkList *p,*q;
+	p = head->next;
+	while (p != head&&p->data !=x)
+		p = p->next;
+	if (p != head)
+	{
+		if (p->prior != head)
+		{
+			q = p->prior;
+			p->prior = q->prior;
+			q->prior->next = p;
+			free(q);
+		}
+		else
+			cout << "不存在前驱节点" << endl;
+	}
+	else
+		cout << "不存在元素" <<x<< endl;
+}
+/*删除元素x的后继*/
+void DeleteElementAfter(CDLinkList *head, int x)
+{
+	CDLinkList *p, *post;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+	{
+		if (p->next != head)
+		{
+			post = p->next;
+			post->next->prior = p;
+			p->next = post->next;
+			free(post);
+		}
+		else
+			cout << "没有后继" << endl;
+	}
+	else
+		cout << "不存在元素" << x << endl;
+}
+/*删除给定位置上的元素*/
+void DeleteElementInPos(CDLinkList *head, int pos)
+{
+	CDLinkList *p, *post;
+	int i;
+	for (i = 1, p = head->next; i < pos; i++, p = p->next);
+	if (p != head)
+	{
+		p->next->prior = p->prior;
+		p->prior->next = p->next;
+		free(p);
+	}
+	else
+		cout << "超过了表长" << endl;
+}
+/*查找元素x*/
+void FindElement(CDLinkList *head, int x)
+{
+	CDLinkList  *p;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+		cout << "找到" << p->data << endl;
+	else
+		cout << "不存在这样的元素" << endl;
+}
+/*x之后插入元素*/
+void InsertElementAfter(CDLinkList *head, int x, ElementType data)
+{
+	CDLinkList *p, *node;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+	{
+		node = (CDLinkList *)malloc(sizeof(CDLinkList));
+		node->data = data;
+		node->next = p->next;
+		node->prior = p;
+		p->next->prior = node;
+		p->next = node;
+	}
+	else
+		cout << "不存在这样的元素" << endl;
+}
+/*x之前插入元素*/
+void InsertElementBefore(CDLinkList *head, int x, ElementType data)
+{
+	CDLinkList *p, *q, *node;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+	{
+		q = p->prior;
+		node = (CDLinkList *)malloc(sizeof(CDLinkList));
+		node->data = data;
+		node->next = p;
+		node->prior = q;
+		p->prior = node;
+		q->next = node;
+	}
+	else
+		cout << "不存在这样的元素" << endl;
+}
+/*指定位置插入元素*/
+void InsertElementInPos(CDLinkList *head, int pos,ElementType data)
+{
+	CDLinkList *p,*node;
+	int i = 1;
+	for (i = 1, p = head->next; i < pos-1; i++, p = p->next);
+	node = (CDLinkList *)malloc(sizeof(CDLinkList));
+	node->data = data;
+	node->next = p->next;
+	node->prior = p;
+	p->next->prior = node;
+	p->next = node;
+
+}
+/*输出链表*/
+void PrintCDLinkList(CDLinkList *head)
+{
+	CDLinkList *p;
+	p = head->next;
+	while (p != head)
+	{
+		cout << p->data << " ";
+		p = p->next;
+	}
+	cout << endl;
+}
+/*销毁链表*/
+void DestroyCDLinkList(CDLinkList *head)
+{
+	CDLinkList *p, *post;
+	p = head->next;
+	while (p != head)
+	{
+		post = p->next;
+		cout << "释放" << p->data << " ";
+		free(p);
+		p = post;
+	}
+}
+int main()
+{
+	int Element[10] = { 22,14,45,47,41,10,1,23,54,55 };
+	CDLinkList *L;
+	/*CreateCycleDLinkListHead(L, Element, 10);
+	cout << "头插法建立循环双链表" << endl;
+	PrintCDLinkList(L);
+	DestroyCDLinkList(L);*/
+
+	CreateCycleDLinkListTail(L, Element, 10);
+	cout << "尾插法建立双链表" << endl;
+	PrintCDLinkList(L);
+
+	/*DeleteElement(L,47);
+	cout << "删除元素47" << endl;
+	PrintCDLinkList(L);*/
+	
+	/*DeleteElementBefore(L , 41);
+	cout << "删除41之前的元素" << endl;
+	PrintCDLinkList(L);*/
+
+	/*DeleteElementAfter(L, 47);
+	cout << "删除41之后的元素" << endl;
+	PrintCDLinkList(L);*/
+
+	/*DeleteElementInPos(L, 8);
+	cout << "删除第5个位置上的元素" << endl;
+	PrintCDLinkList(L);*/
+
+	/*FindElement(L, 47);
+	cout << "查找元素47" << endl;*/
+
+	/*InsertElementAfter(L,47,100);
+	cout << "元素47之后插入100" << endl;
+	PrintCDLinkList(L);*/
+
+	/*InsertElementBefore(L, 47, 120);
+	cout << "元素47之前插入120" << endl;
+	PrintCDLinkList(L);*/
+
+	InsertElementInPos(L, 5, 114);
+	cout << "在第5个位置上插入114" << endl;
+	PrintCDLinkList(L);
+
+	DestroyCDLinkList(L);
+	system("pause");
+	return 0;
+}
