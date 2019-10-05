@@ -1,0 +1,155 @@
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct CycleSLinkList
+{
+	ElementType data;
+	struct CycleSLinkList *next;
+}CSLinkList;
+void CreateCSLinkListHEAD(CSLinkList *&head, ElementType array[], int n)
+{
+	CSLinkList *p;
+	head = (CSLinkList *)malloc(sizeof(CSLinkList));
+	head->next = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (CSLinkList *)malloc(sizeof(CSLinkList));
+		p->data = array[i];
+		p->next = head->next;
+		head->next = p;
+	}
+}
+void CreateCSLinkListTAIL(CSLinkList *&head, ElementType array[], int n)
+{
+	CSLinkList *p, *tail;
+	head = (CSLinkList *)malloc(sizeof(CSLinkList));
+	tail = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (CSLinkList *)malloc(sizeof(CSLinkList));
+		p->data = array[i];
+		tail->next = p;
+		tail = p;
+	}
+	tail->next = head;
+}
+/*设计一个算法统计循环单链表中节点的个数*/
+void CalTotalNode(CSLinkList *head)
+{
+	CSLinkList *p;
+	int i;
+	for (p = head->next, i = 0; p != head; p = p->next, i++);
+	cout << "有" <<i<<"个节点"<< endl;
+}
+/*设计一个算法删除循环单链表中值最大的元素*/
+void DeleteMaxElement(CSLinkList *head)
+{
+	CSLinkList *p, *pre,*max,*maxpre;
+	p = head->next;
+	pre = head;
+	max = p;
+	maxpre = head;
+	while (p != head)
+	{	
+		if (p->data > max->data)
+		{
+			maxpre = pre;
+			max = p;
+		}
+		pre = p;
+		p = p->next;
+	}
+	maxpre->next = max->next;
+	free(max);
+}
+/*头插法实现单链表中的节点逆置*/
+void ReverseCSLinkListHead(CSLinkList *head)
+{
+	//采用头插法把原来链表上的节点摘下来挂载上面
+	CSLinkList *p, *post;
+	p = head->next;
+	head->next = head;
+	while (p != head)
+	{
+		post = p->next;
+		p->next = head->next;
+		head->next = p;
+		p = post;
+	}
+}
+/*改变指针方向实现单链表的逆置*/
+void ReverseCSLinkList(CSLinkList *head)
+{
+	CSLinkList *p, *q, *post;
+	p = head->next;
+	post = p->next;
+	p->next =head;
+	while (post != head)
+	{
+		q = post->next;
+		post->next = p;
+		p = post;
+		post = q;
+	}
+	head->next = p;
+}
+void PrintCSLinkList(CSLinkList *head)
+{
+	CSLinkList *p;
+	p = head->next;
+	while (p != head)
+	{
+		cout << p->data << " ";
+		p = p->next;
+	}
+	cout << endl;
+}
+void DestroyCSLinkList(CSLinkList *head)
+{
+	CSLinkList *p, *post;
+	p = head->next;
+	post = NULL;
+	while (p != head)
+	{
+		post = p->next;
+		cout << "释放" << p->data << " ";
+		free(p);
+		p = post;
+	}
+}
+int main()
+{
+	int Element[10] = { 22,14,45,47,41,10,1,23,54,55 };
+	CSLinkList *L;
+
+	/*CreateCSLinkListHEAD(L, Element, 10);
+	cout << "头插法创建循环单链表" << endl;
+	PrintCSLinkList(L);
+	cout << "销毁循环单链表" << endl;
+	DestroyCSLinkList(L);*/
+
+	CreateCSLinkListTAIL(L, Element, 10);
+	cout << "尾插法创建循环单链表" << endl;
+	PrintCSLinkList(L);
+
+	/*cout << "统计循环单链表节点个数" << endl;
+	CalTotalNode(L);*/
+
+	/*cout <<"删除循环单链表中最大值节点"<< endl;
+	DeleteMaxElement(L);
+	PrintCSLinkList(L);*/
+
+	//ReverseCSLinkListHead(L);
+	//cout << "头插法实现O(1)空间复杂度的循环单链表转置" << endl;
+	//PrintCSLinkList(L);
+
+	ReverseCSLinkList(L);
+	cout << "指针转向实现循环单链表逆置" << endl;
+	PrintCSLinkList(L);
+
+	cout << "销毁循环单链表" << endl;
+	DestroyCSLinkList(L);
+	system("pause");
+	return 0;
+}
