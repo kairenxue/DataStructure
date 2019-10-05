@@ -1,0 +1,76 @@
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+#define MaxSize 20
+typedef struct
+{
+	ElementType data[MaxSize];
+	int top;
+}SqStack;
+/*初始化栈*/
+void InitialStack(SqStack &st)
+{
+	st.top = -1;
+}
+/*判断栈是否为空*/
+int StackEmpty(SqStack &st)
+{
+	return (st.top == -1);
+}
+/*进栈算法*/
+void Push(SqStack &st, ElementType x)
+{
+	if (st.top == MaxSize - 1)
+	{
+		cout << "栈满" << endl;
+		return;
+	}
+	st.data[++st.top] = x;
+}
+/*出栈算法*/
+void Pop(SqStack &st, ElementType &x)
+{
+	if (st.top == -1)
+	{
+		cout << "栈空" << endl;
+		return;
+	}
+	x = st.data[st.top--];
+	return;
+}
+/*取栈顶元素*/
+void GetTop(SqStack &st, ElementType &x)
+{
+	if (st.top == -1)
+	{
+		cout << "栈空" << endl;
+		return;
+	}
+	x = st.data[st.top];
+	return;
+}
+int main()
+{
+	int Element[10] = { 2,10,1,45,47,11,12,54,69,66 };
+	SqStack stack;
+	ElementType element,x;
+	InitialStack(stack);
+	for (int i = 0; i < 10; i++)
+	{
+		cout << "Push:" << Element[i]<<"  ";
+		Push(stack, Element[i]);
+		GetTop(stack, element);
+		cout << "Top:" <<element<< endl;
+	}
+	
+	for (int i = 0; i < 5; i++)
+	{
+		GetTop(stack, x);
+		cout << "Top:" << x <<" ";
+		Pop(stack, element);
+		cout << "Pop:" << element << endl;
+	}
+	system("pause");
+	return 0;
+}
