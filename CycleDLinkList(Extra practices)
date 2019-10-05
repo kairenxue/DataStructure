@@ -1,0 +1,225 @@
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct CycleDLinkList
+{
+	ElementType data;
+	struct CycleDLinkList *prior;
+	struct CycleDLinkList *next;
+}CDLinkList;
+void CreateCDLinkListHEAD(CDLinkList *&head, ElementType array[], int n)
+{
+	CDLinkList *p;
+	head = (CDLinkList *)malloc(sizeof(CDLinkList));
+	head->next = head->prior = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (CDLinkList *)malloc(sizeof(CDLinkList));
+		p->data = array[i];
+		p->next = head->next;
+		p->prior = head;
+		if (head->next != head)
+			head->next->prior = p;
+		head->next = p;
+	}
+}
+void CreateCDLinkListTAIL(CDLinkList *&head, ElementType array[], int n)
+{
+	CDLinkList *p, *tail;
+	head = (CDLinkList *)malloc(sizeof(CDLinkList));
+	tail = head;
+	for (int i = 0; i < n; i++)
+	{
+		p = (CDLinkList *)malloc(sizeof(CDLinkList));
+		p->data = array[i];
+		p->prior = tail;
+		tail->next = p;
+		tail = p;
+	}
+	tail->next = head;
+	head->prior = tail;
+}
+void CalTotalNode(CDLinkList *head)
+{
+	CDLinkList *p;
+	int i;
+	for (i = 0, p = head->next; p != head; p = p->next, i++);
+	cout << "总结点:" << i << endl;
+}
+void DeleteFirstElementX(CDLinkList *head, int x)
+{
+	CDLinkList *p,*post;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+	{
+		post = p->next;
+		post->prior = p->prior;
+		p->prior->next = post;
+		free(p);
+	}
+	else
+		cout << "不存在" << x << endl;
+}
+/*真交换*/
+void SwapXandAfterTrue(CDLinkList *head, int x)
+{
+	CDLinkList *p, *post;
+	p = head->next;
+	while (p != head&&p->data != x)
+		p = p->next;
+	post = p->next;
+	//先把节点p从链表上摘下来，然后再把节点查到原来p的节点的后面，就实现了交换
+	if (p != head) //说明找到了x
+	{
+		if (p->next!=head)
+		{
+			p->next->prior = p->prior;
+			p->prior->next = p->next;
+
+			p->next = post->next;
+			p->prior = post;
+			post->next->prior = p;
+			post->next = p;
+		}
+		else
+			cout << "不存在后继" << endl;
+		
+	}
+	else
+		cout << "不存在" << x << endl;
+}
+/*数据域交换*/
+void SwapXandAfterFalse(CDLinkList *head, int x)
+{
+	CDLinkList *p;
+	p = head->next;
+	ElementType temp;
+	while (p != head&&p->data != x)
+		p = p->next;
+	if (p != head)
+	{
+		if (p->next != head)
+		{
+			temp = p->next->data;
+			p->next->data = p->data;
+			p->data = temp;
+		}
+		else
+			cout << "不存在后继" << endl;
+	}
+	else
+		cout << "不存在" << x << endl;
+}
+void ReverseCDLinkList(CDLinkList *head)
+{
+	CDLinkList *p, *post;
+	p = head;
+	while (p != head)
+	{
+		post = p->next;
+		p->next = p->prior;
+		p->prior = post;
+	}
+}
+/*头插法逆置双链表*/
+void ReverseCDLinkListHead(CDLinkList *head)
+{
+	CDLinkList *p,*q;
+	p = head->next;
+	head->next = head->prior = head;
+	while (p != head)
+	{
+		q = p->next;
+		p->next = head->next;
+		p->prior = head;
+		if (head->next != NULL)
+			head->next->prior = p;
+		head->next = p;
+		p = q;
+	}
+}
+/*判断双链表是否对称*/
+void JudgeSymmetry(CDLinkList *head)
+{
+	CDLinkList *p, *q;
+	p = head->next;
+	q = head->prior;
+	while (p != q||p->next != q)
+	{
+		if (p->data == q->data)
+		{
+			cout << "当前比较" << p->data << "vs" << q->data << endl;
+			p = p->next;
+			q = q->prior;
+		}
+		else	
+			return;
+	}
+	cout << "链表对称" << endl;
+}
+void PrintCDLinkList(CDLinkList *head)
+{
+	CDLinkList *p;
+	p = head->next;
+	while (p != head)
+	{
+		cout << p->data << " ";
+		p = p->next;
+	}
+	cout << endl;
+}
+void DestroyCDLinkList(CDLinkList *head)
+{
+	CDLinkList *p, *post;
+	p = head->next;
+	while (p != head)
+	{
+		post = p->next;
+		cout << "释放" << p->data << " ";
+		free(p);
+		p = post;
+	}
+}
+int main()
+{
+	int Element[10] = { 5,4,47,1,14,4,1,47,74,55 };
+	CDLinkList *L;
+	CreateCDLinkListHEAD(L, Element, 10);
+	cout << "头插法建立循环双链表" << endl;
+	PrintCDLinkList(L);
+
+	/*CreateCDLinkListTAIL(L, Element, 10);
+	cout << "尾插法建立循环双链表" << endl;
+	PrintCDLinkList(L);*/
+
+	/*CalTotalNode(L);*/
+
+	/*DeleteFirstElementX(L, 47);
+	cout << "删除循环链表中第一个47" << endl;
+	PrintCDLinkList(L);*/
+
+	/*SwapXandAfterTrue(L, 47);
+	cout << "交换47和他的后继" << endl;
+	PrintCDLinkList(L);*/
+
+	/*SwapXandAfterFalse(L, 1);
+	cout << "交换1和他的后继" << endl;
+	PrintCDLinkList(L);*/
+
+	/*JudgeSymmetry(L);*/
+
+	ReverseCDLinkListHead(L);
+	cout << "头插法逆置循环双链表" << endl;
+	PrintCDLinkList(L);
+
+	ReverseCDLinkList(L);
+	cout << "指针转向逆置循环双链表" << endl;
+	PrintCDLinkList(L);
+	cout << "销毁循环双链表" << endl;
+	DestroyCDLinkList(L);
+	system("pause");
+	return 0;
+}
