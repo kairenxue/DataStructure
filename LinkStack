@@ -1,0 +1,98 @@
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+typedef struct LinkStack
+{
+	ElementType data;
+	struct LinkStack *next;
+}LinkStack;
+/*用带头结点的单链表来模拟栈*/
+/*初始化栈*/
+void InitialStack(LinkStack *&ls)
+{
+	ls = (LinkStack *)malloc(sizeof(LinkStack));
+	ls->next = NULL;
+}
+/*判断栈是否为空*/
+int StackEmpty(LinkStack *ls)
+{
+	return(ls->next == NULL);	
+}
+/*进栈*/
+void Push(LinkStack *ls, ElementType x)
+{
+	/*实质上就是头插法，在头部进行添加*/
+	LinkStack *node;
+	node = (LinkStack *)malloc(sizeof(LinkStack));
+	node->data = x;
+	node->next = ls->next;
+	ls->next = node;
+}
+void Pop(LinkStack *ls, ElementType &x)
+{
+	LinkStack *post;
+	if (ls->next == NULL)
+	{
+		cout << "栈空" << endl;
+		return;
+	}
+	else
+	{
+		x = ls->next->data;
+		post = ls->next;
+		ls->next = post->next;
+		free(post);
+	}	
+}
+void GetTop(LinkStack *ls, ElementType &x)
+{
+	if (ls->next == NULL)
+	{
+		cout << "栈空" << endl;
+		return;
+	}
+	else
+		x = ls->next->data;
+}
+void Destroy(LinkStack *ls)
+{
+	LinkStack *p,*post;
+	p = ls->next;
+	while (p != NULL)
+	{
+		post = p->next;
+		cout << "释放" <<p->data<< endl;
+		free(p);
+		p = post;
+	}
+}
+int main()
+{
+	LinkStack *ls;
+	ElementType x;
+	int Element[10] = { 1,2,3,4,5,8,9,7,85,4 };
+	InitialStack(ls);
+	for (int i = 0; i < 10; i++)
+	{
+		cout << "Push " << Element[i] << endl;
+		Push(ls, Element[i]);
+	}
+	GetTop(ls, x);
+	cout << "Get Top" << x << endl;
+	Pop(ls, x);
+	cout << "Pop:" << x << endl;
+	Pop(ls, x);
+	cout << "Pop:" << x << endl; 
+	Pop(ls, x);
+	cout << "Pop:" << x << endl; 
+	Pop(ls, x);
+	cout << "Pop:" << x << endl; 
+	Pop(ls, x);
+	cout << "Pop:" << x << endl;
+	GetTop(ls, x);
+	cout << "Get Top" << endl;
+	Destroy(ls);
+	system("pause");
+	return 0;
+}
