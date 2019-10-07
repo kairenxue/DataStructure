@@ -586,36 +586,6 @@ void OccurSimultaneousAscend(LinkList *headfirst, LinkList *headsecond, LinkList
 	}
 	tailOccurSim->next = NULL;
 }
-/*2-3-42用单链表表示集合，设计一个算法求两个集合的差集*/
-void SubLinkListDis(LinkList *headfirst, LinkList *headsecond, LinkList *&Sublist)
-{
-
-}
-/*2-3-43用单链表表示集合，单链表递增有序，设计一个算法求两个集合的差集*/
-void SubLinkListAscend(LinkList *headfirst, LinkList *headsecond, LinkList *&Sublist)
-{
-
-}
-/*2-3-44用单链表表示集合，设计一个算法求两个集合的并集*/
-void UnionLinkListDis(LinkList *headfirst, LinkList *headsecond, LinkList *&Unionlist)
-{
-
-}
-/*2-3-45用单链表表示集合，单链表递增有序，设计一个算法求两个集合的并集*/
-void UnionLinkListAscend(LinkList *headfirst, LinkList *headsecond, LinkList *&Unionlist)
-{
-
-}
-/*2-3-46*/
-
-
-/*2-3-47*/
-
-
-/*2-3-48*/
-
-
-
 int main()
 {
 	int Element[10] = {14,75,3,4,21,6,7,8,9,10 };
