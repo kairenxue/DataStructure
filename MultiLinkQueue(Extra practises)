@@ -1,0 +1,200 @@
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+#define MAX 15
+typedef int ElementType;
+typedef struct QueueNode
+{
+	ElementType data;
+	struct QueueNode *next; /*链队列中的一般节点*/
+}QueueNode;
+typedef struct LinkQueue
+{
+	/*使用不带头结点的单链表模拟链队列*/
+	struct QueueNode *front; /*front:指向首元节点，队首删除*/
+	struct QueueNode *rear;  /*rear:指向队尾元素，队尾插入*/
+}LinkQueue;
+/*初始化链队列*/
+void InitialLinkQueue(LinkQueue *&lq)
+{
+	lq = (LinkQueue *)malloc(sizeof(LinkQueue));
+	lq->front = lq->rear = NULL;
+}
+/*判断链队列是否为空*/
+int EmptyLinkQueue(LinkQueue *lq)
+{
+	return (lq->rear == NULL);
+}
+/*进队列*/
+void EnLinkQueue(LinkQueue *lq, int x)
+{
+	QueueNode *p;
+	p = (QueueNode *)malloc(sizeof(QueueNode));
+	p->data = x;
+	p->next = NULL;
+	if (lq->rear == NULL) /*说明原来队列为空*/
+	{
+		lq->front = lq->rear = p;
+	}
+	else
+	{
+		lq->rear->next = p;
+		lq->rear = p;
+	}
+}
+/*出队列*/
+void DeLinkQueue(LinkQueue *lq, ElementType &x)
+{
+	QueueNode *p;
+	p = lq->front;
+	/*先判断队列是否为空*/
+	if (lq->rear == NULL)
+		return;
+	else
+	{
+		x = lq->front->data;
+		lq->front = p->next;;
+		free(p);
+	}
+}
+/*输出链队列*/
+void PrintLinkQueue(LinkQueue *lq)
+{
+	QueueNode *p;
+	p = lq->front;
+	while (p != NULL)
+	{
+		cout << p->data << "->";
+		p = p->next;
+	}
+	cout << endl;
+}
+/*销毁链队列*/
+void DestroyLinkQueue(LinkQueue *lq)
+{
+	QueueNode *p,*post;
+	p = lq->front;
+	while (p != NULL)
+	{
+		post = p->next;
+		cout << "释放" << p->data<<" ";
+		free(p);
+		p = post;
+	}
+}
+/*
+*输入N个10以内的正整数，每输入一个元素x就把它插入到x号队列中去，
+*最后把这10个队列中的非空队列，按照队列号从小到大的顺序串联成一条链，并输出该链条中的所有元素
+*/
+/*插入元素到相应队列*/
+void InsertMultiQueue(QueueNode *queueHead[], QueueNode *queueTail[],int x)
+{
+	QueueNode *s;
+	s = (QueueNode *)malloc(sizeof(QueueNode));
+	s->data = x;
+	s->next = NULL;
+	if (queueHead[x] == NULL)
+	{
+		queueHead[x] = s;
+		queueTail[x] = s;
+	}
+	else
+	{
+		queueTail[x]->next = s;
+		queueTail[x] = s;
+	}
+}
+/*输入元素，插入到对应队列*/
+void CreateMultiQueue(QueueNode *queueHead[], QueueNode *queueTail[])
+{
+	int n,x;
+	cout << "输入个数:";
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		do
+		{
+			cout << "第" << i + 1 << "个：";
+			cin >> x;
+		} while (x < 0 || x>10);
+		InsertMultiQueue(queueHead, queueTail, x);
+	}
+}
+/*多链表合并O(1)空间复杂度*/
+QueueNode* LinkMultiQueue(QueueNode *queueHead[], QueueNode *queueTail[])
+{
+	QueueNode *head=NULL, *tail=NULL,*p;
+	int first = 1;
+	for (int i = 0; i < MAX; i++)
+	{
+		if (queueHead[i] != NULL&&first == 1)
+		{
+			head = queueHead[i];
+			tail = queueTail[i];
+			first = 0;
+		}
+		if (queueHead[i] != NULL&&first == 0)
+		{
+			tail->next = queueHead[i];
+			tail = queueTail[i];
+		}
+	}
+	cout << "输出所有元素" << endl;
+	p = head;
+	while (p != NULL)
+	{
+		cout << p->data << "->";
+		p = p->next;
+	}
+	cout << endl;
+	return head;
+}
+/*销毁合并表节点*/
+void DestroyMultiLinkQueue(QueueNode *lq)
+{
+	QueueNode *p, *post;
+	p = lq;
+	while (p != NULL)
+	{
+		post = p->next;
+		cout << "释放" << p->data << " ";
+		free(p);
+		p = post;
+	}
+	cout << endl;
+}
+int main()
+{
+	/*链表的正确性测试*/
+	/*int Element[10] = { 1,2,3,4,5,8,9,7,85,4 };
+	LinkQueue *lq;
+	ElementType e;
+	InitialLinkQueue(lq);
+	for (int i = 0; i < 10; i++)
+		EnLinkQueue(lq, Element[i]);
+	cout << "初始队列" << endl;
+	PrintLinkQueue(lq);
+
+	DeLinkQueue(lq, e);
+	cout << "出队列 " << e << endl;
+	PrintLinkQueue(lq);
+
+	DeLinkQueue(lq, e);
+	cout << "出队列 " << e << endl;
+	PrintLinkQueue(lq);
+
+	DeLinkQueue(lq, e);
+	cout << "出队列 " << e << endl;
+	PrintLinkQueue(lq);
+
+	DestroyLinkQueue(lq);*/
+
+	QueueNode *queuehead[MAX], *queuetail[MAX],*head,*q,*post;
+	for (int i = 0; i < MAX; i++)
+		queuehead[i] = queuetail[i] = NULL;
+	CreateMultiQueue(queuehead, queuetail);
+	head=LinkMultiQueue(queuehead, queuetail);
+	DestroyMultiLinkQueue(head); /*已经将所有节点释放*/
+	system("pause");
+	return 0;
+}
