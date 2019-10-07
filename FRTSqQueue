@@ -1,0 +1,69 @@
+/*设计一个循环队列，用front和rear分别作为队首和队尾指针，另外用一个标记tag表示队列可能为空(0)，可能为满(1)。这样加上front==rear可以作为队列为空或队列为满的条件*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+#define MAX 10
+typedef int ElementType;
+typedef struct FRTSqQueue  /*front+rear+tag*/
+{
+	ElementType data[MAX];
+	int front;
+	int rear;
+	int tag;
+}FRTSqQueue;
+/*思路：
+	初始时front=rear=0,tag=0,成功的进队操作tag=1(任何进队操作后队列可能满，单不一定满，任何进队操作后队列不可能为空)
+	成功的出队操作后tag=0(队列可能空，但不一定空，任何出队操作后队列不可能满)*/
+/*初始化队列*/
+void InitialQueue(FRTSqQueue &frtsq)
+{
+	frtsq.front = frtsq.rear = 0;
+	frtsq.tag = 0;
+}
+/*判断队列为空*/
+int EmptyQueue(FRTSqQueue frtsq)
+{
+	return(frtsq.front==frtsq.rear&&frtsq.tag==0);
+}
+/*判断队列满*/
+int FullQueue(FRTSqQueue frtsq)
+{
+	return(frtsq.front == frtsq.rear&&frtsq.tag == 1);
+}
+/*元素进队列*/
+void EnQueue(FRTSqQueue &frtsq, int x)
+{
+	if (FullQueue(frtsq)) return;
+	frtsq.rear = (frtsq.rear + 1) % MAX;
+	frtsq.data[frtsq.rear] = x;
+	frtsq.tag = 1;
+}
+/*元素出队列*/
+void DeQueue(FRTSqQueue &frtsq, ElementType &x)
+{
+	if (EmptyQueue(frtsq)) return;
+	frtsq.front = (frtsq.front + 1) % MAX;
+	x=frtsq.data[frtsq.front];
+	frtsq.tag = 0;
+}
+int main()
+{
+	int Element[10] = { 1,2,3,4,5,8,9,7,85,4 };
+	FRTSqQueue frtsq;
+	ElementType e;
+	InitialQueue(frtsq);
+	for (int i = 0; i < 10; i++)
+		EnQueue(frtsq, Element[i]);
+
+	if (FullQueue(frtsq))
+		cout << "队满" << endl;
+	for (int i = 0; i < 10; i++)
+	{
+		DeQueue(frtsq, e);
+		cout << "出队元素 " << e << endl;
+	}
+	if (EmptyQueue(frtsq))
+		cout << "队空" << endl;
+	system("pause");
+	return 0;
+}
