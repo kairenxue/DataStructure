@@ -1,0 +1,186 @@
+/*顺序队列附加算法练习*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+#define MAX 20
+typedef int ElementType;
+typedef struct SqStack  
+{
+	ElementType sdata[MAX];
+	int top;
+}SqStack; /*顺序栈定义*/
+typedef struct SqQueue
+{
+	ElementType data[MAX];
+	int front;
+	int rear;
+}SqQueue; /*顺序队列定义*/
+/*栈初始化*/
+void InitialStack(SqStack &stack)
+{
+	stack.top = -1;
+}
+/*队列初始化*/
+void InitialQueue(SqQueue &sq)
+{
+	sq.front = sq.rear = 0;
+}
+/*判断栈空*/
+int StackEmpty(SqStack stack)
+{
+	return (stack.top == -1);
+}
+/*判断队空*/
+int QueueEmpty(SqQueue sq)
+{
+	return (sq.front == sq.rear);
+}
+/*判断栈满*/
+int StackFull(SqStack stack)
+{
+	return (stack.top == MAX - 1);
+}
+/*判断队满*/
+ int QueueFull(SqQueue sq)
+{
+	 return((sq.rear + 1) % MAX == sq.front);
+}
+ /*进栈*/
+ void Push(SqStack &stack, int x)
+ {
+	 if (stack.top == MAX - 1)
+	 {
+		 cout << "栈满" << endl;
+		 return;
+	 }
+	 else
+	 {
+		 stack.sdata[++stack.top] = x;
+		 cout << "X=" << x << "进栈" << endl;
+	 }
+
+ }
+/*进队列*/
+void EnQueue(SqQueue &sq, int x)
+{
+	if ((sq.rear + 1) % MAX == sq.front)
+		return;
+	else
+	{
+		sq.rear = (sq.rear + 1) % MAX;
+		sq.data[sq.rear] = x;
+		cout << "X=" << x << "进队列" << endl;
+	}
+	return;
+}
+/*出栈*/
+void Pop(SqStack &stack, ElementType &x)
+{
+	if (stack.top == -1)
+	{
+		cout << "栈空" << endl;
+		return;
+	}
+	else
+	{
+		x = stack.sdata[stack.top--];
+		cout << "X=" << x << "出栈" << endl;
+	}
+}
+/*出队列*/
+void DeQueue(SqQueue &sq, ElementType &x)
+{
+	if (sq.rear == sq.front)
+	{
+		cout << "队列空" << endl;
+		return;
+	}
+	else
+	{
+		sq.front = (sq.front + 1) % MAX;
+		x = sq.data[sq.front];
+		cout << "X=" << x << "出队" << endl;
+	}
+}
+/*设计一个算法，利用队列的基本运算返回指定队列中的队尾元素
+*利用循环队列，队列的基本运算中，没有取队尾元素的操作，可以再使用一个循环队列temp,先先队列lq中的元素
+*出队，进队到temp，然后再从temp中出队在进入到队列lq中，最后一个元素即为所求
+*/
+ElementType Last(SqQueue lq)
+{
+	SqQueue temp;
+	ElementType x;
+	InitialQueue(temp);
+	while (!QueueEmpty(lq))
+	{
+		DeQueue(lq, x);
+		EnQueue(temp, x);
+	}
+	while (!QueueEmpty(temp))
+	{	
+		DeQueue(temp, x);
+		EnQueue(lq, x);
+	}
+	return x;
+}
+/*设计一个算法，利用队列和栈的基本运算，将队列中的内容进行逆转*/
+void ReverseSqQueue(SqQueue &lq)
+{
+	SqStack stack;
+	ElementType x;
+	InitialStack(stack);
+	while (!QueueEmpty(lq))
+	{
+		DeQueue(lq, x);
+		Push(stack, x);
+	}
+	while (!StackEmpty(stack))
+	{
+		Pop(stack, x);
+		EnQueue(lq, x);
+	}
+}
+/*删除队列中第K个元素的算法*/
+void DeleteKPos(SqQueue &sq,int k)
+{
+	ElementType x;
+	int count = (sq.rear - sq.front + MAX) % MAX;
+	if (k <= 0 || k > count) return; /*插入失败*/
+	for (int i = 1; i <= count; i++)
+	{
+		DeQueue(sq, x);
+		if (i != k)
+			EnQueue(sq, x);
+	}
+}
+/*在队列中第K个元素之后添加元素*/
+void InsertKPos(SqQueue &sq, int k,ElementType x)
+{
+	ElementType e;
+	int count = (sq.rear - sq.front + MAX) % MAX;
+	if (k <= 0 || k > count) return; /*插入失败*/
+	for (int i = 1; i <= count; i++)
+	{
+		DeQueue(sq, e);
+		EnQueue(sq, e);
+		if (i == k)
+			EnQueue(sq, x);
+	}
+}
+int main()
+{
+	int Element[10] = { 1,2,3,4,5,8,9,7,85,4 };
+	SqQueue sqqueue;
+	ElementType x;
+	InitialQueue(sqqueue);
+	for (int i = 0; i < 10; i++)
+		EnQueue(sqqueue, Element[i]);
+	/*DeQueue(sqqueue, x);
+	cout << "取队尾元素" << Last(sqqueue) << endl;*/
+
+	/*ReverseSqQueue(sqqueue);*/
+	/*DeleteKPos(sqqueue, 5);*/
+	InsertKPos(sqqueue, 6, 14);
+	system("pause");
+	return 0;
+}
