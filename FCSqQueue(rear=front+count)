@@ -1,0 +1,71 @@
+/*相比较于顺序队列，我们可以根据队首指针和队列中的元素个数来计算队尾指针，根据这种情况，设计顺序队列*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+#define MAX 20
+typedef int ElementType;
+typedef struct FCSqQueue /*front+count*/
+{
+	ElementType data[MAX];
+	int front;
+	int count;
+}FCSqQueue;
+/*队列初始化*/
+void InitialFCSqQueue(FCSqQueue &fcsq)
+{
+	fcsq.front = 0;
+	fcsq.count = 0;
+}
+/*判断队空*/
+int EmptyFCSqQueue(FCSqQueue fcsq)
+{
+	return (fcsq.count == 0);
+}
+/*进队列*/
+void EnFCSqQueue(FCSqQueue &fcsq,int x)
+{
+	int rear;
+	/*队列满*/
+	if (fcsq.count == MAX) return;
+	else
+	{
+		rear = (fcsq.front + fcsq.count) % MAX;
+		rear = (rear + 1) % MAX;
+		fcsq.data[rear] = x;
+		fcsq.count++;
+	}
+}
+/*出队列*/
+void DeFCSqQueue(FCSqQueue &fcsq,ElementType &x)
+{
+	if (fcsq.count == 0) return;
+	else /*队列不为空*/
+	{
+		fcsq.front = (fcsq.front + 1) % MAX;
+		x = fcsq.data[fcsq.front];
+		fcsq.count--;
+	}
+}
+int main()
+{
+	int Element[10] = { 1,2,3,4,5,8,9,7,85,4 };
+	FCSqQueue fcsq;
+	ElementType e;
+	InitialFCSqQueue(fcsq);
+	for (int i = 0; i < 10; i++)
+		EnFCSqQueue(fcsq, Element[i]);
+	DeFCSqQueue(fcsq, e);
+	cout << "出队元素 " << e << endl;
+	DeFCSqQueue(fcsq, e);
+	cout << "出队元素 " << e << endl;
+	DeFCSqQueue(fcsq, e);
+	cout << "出队元素 " << e << endl;
+	DeFCSqQueue(fcsq, e);
+	cout << "出队元素 " << e << endl;
+	if (EmptyFCSqQueue(fcsq))
+		cout << "队列为空" << endl;
+	else
+		cout << "队列现在不为空" << endl;
+	system("pause");
+	return 0;
+}
