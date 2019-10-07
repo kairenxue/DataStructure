@@ -1,0 +1,122 @@
+/*链队列的基本算法*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+typedef int ElementType;
+/*链队列中数据节点*/
+typedef struct QueueNode
+{
+	ElementType data;
+	struct QueueNode *next; /*基于不带头结点的单链表实现链队列*/
+}QueueNode;
+/*链队节点*/
+typedef struct LinkQueue
+{
+	struct QueueNode *front; /*front：指向首元节点，在头部删除*/
+	struct QueueNode *rear;  /*rear：指向最后一个节点，在尾部插入*/
+}LinkQueue;
+/*初始化链队列*/
+void InitialLinkQueue(LinkQueue *&lq)
+{
+	lq = (LinkQueue *)malloc(sizeof(LinkQueue));
+	lq->front = lq->rear = NULL;
+}
+/*判断链队列是否为空*/
+void LinkQueueEmpty(LinkQueue *lq)
+{
+	if (lq->front == NULL) /*或者lq->next==NULL*/
+		cout << "队列空" << endl;
+	else
+		cout << "队列不空" << endl;
+}
+/*进队列*/
+void EnLinkQueue(LinkQueue *lq,ElementType x)
+{
+	QueueNode *node;
+	node = (QueueNode *)malloc(sizeof(QueueNode));
+	node->data = x;
+	node->next = NULL; //不可或缺
+	if (lq->rear == NULL)  //如果原来队列为空
+		lq->front = lq->rear = node;
+	else
+	{
+		lq->rear->next = node;
+		lq->rear = node;
+	}
+}
+/*出队列*/
+void DeLinkQueue(LinkQueue *lq,ElementType &x)
+{
+	/*在队首删除*/
+	/*先判断队列是否为空*/
+	QueueNode *node;
+	node = lq->front;
+	if (lq->rear == NULL)
+	{
+		cout << "队列为空" << endl;
+		return;
+	}
+	else
+	{
+		/*队列中只有一个节点*/
+		if (lq->front == lq->rear)
+			lq->front = lq->rear = NULL;
+		else
+			lq->front = node->next;
+	}
+	x = node->data;
+	free(node);
+}
+/*输出链队列*/
+void PrintLinkQueue(LinkQueue *lq)
+{
+	QueueNode *p, *q;
+	p = lq->front;
+	while (p != NULL)
+	{
+		cout << p->data << "->";
+		p = p->next;
+	}
+	cout << endl;
+}
+/*链队列销毁*/
+void DestroyLinkQueue(LinkQueue *lq)
+{
+	QueueNode *p,*q;
+	p = lq->front;
+	while (p != NULL)
+	{
+		q = p->next;
+		cout << "释放"<<p->data <<" ";
+		free(p);
+		p = q;
+	}
+}
+int main()
+{
+	int Element[10] = { 1,2,3,4,5,8,9,7,85,4 };
+	LinkQueue *lq;
+	ElementType x;
+	InitialLinkQueue(lq);
+	cout << "建立原始队列" << endl;
+	for (int i = 0; i < 10; i++)
+		EnLinkQueue(lq, Element[i]);
+	PrintLinkQueue(lq);
+
+	DeLinkQueue(lq, x);
+	cout << "出队" << x << endl;
+	PrintLinkQueue(lq);
+
+	DeLinkQueue(lq, x);
+	cout << "出队" << x << endl;
+	PrintLinkQueue(lq);
+
+	DeLinkQueue(lq, x);
+	cout << "出队" << x << endl;
+	PrintLinkQueue(lq);
+
+	cout << "销毁链队列" << endl;
+	DestroyLinkQueue(lq);
+	system("pause");
+	return 0;
+}
