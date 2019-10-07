@@ -1,0 +1,82 @@
+/*顺序队列基本算法实现*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+#define MAX 20
+typedef int ElementType;
+typedef struct SqQueue
+{
+	ElementType data[MAX];
+	int rear;
+	int front;
+}SqQueue;
+/*队列初始化*/
+void InitialQueue(SqQueue &sq)
+{
+	sq.front = sq.rear = 0;
+}
+/*判断队空*/
+void QueueEmpty(SqQueue sq)
+{
+	if (sq.front == sq.rear);
+}
+/*判断队满*/
+void QueueFull(SqQueue sq)
+{
+	if ((sq.rear + 1) % MAX == sq.front)
+		cout << "队满" << endl;
+	else
+		cout << "队中尚有空间" << endl;
+	return;
+}
+/*进队列*/
+void EnQueue(SqQueue &sq, int x)
+{
+	if ((sq.rear + 1) % MAX == sq.front)
+		return;
+	else
+	{
+		sq.rear = (sq.rear + 1) % MAX;
+		sq.data[sq.rear] = x;
+		cout << x << " 进队 " << "队首指针front:" << sq.front << "  " << "队尾指针rear：" << sq.rear << endl;
+	}
+	return;
+}
+/*出队列*/
+void DeQueue(SqQueue &sq, ElementType &x)
+{
+	if (sq.rear == sq.front)
+	{
+		cout << "队列空" << endl;
+		return;
+	}
+	else
+	{
+		sq.front = (sq.front + 1) % MAX;
+		x = sq.data[sq.front];
+		cout << x << " 出队 " << "队首指针front:" << sq.front << "  " << "队尾指针rear：" << sq.rear << endl;
+	}
+}
+int main()
+{
+	int Element[10] = { 1,2,3,4,5,8,9,7,85,4 };
+	SqQueue sqqueue;
+	ElementType x;
+	InitialQueue(sqqueue);
+	for (int i = 0; i < 10; i++)
+		EnQueue(sqqueue, Element[i]);
+	DeQueue(sqqueue, x);
+	cout << "出队列：" << x << endl;
+	DeQueue(sqqueue, x);
+	cout << "出队列：" << x << endl;
+	DeQueue(sqqueue, x);
+	cout << "出队列：" << x << endl;
+	DeQueue(sqqueue, x);
+	cout << "出队列：" << x << endl;
+	DeQueue(sqqueue, x);
+	cout << "出队列：" << x << endl;
+	DeQueue(sqqueue, x);
+	cout << "出队列：" << x << endl;
+	system("pause");
+	return 0;
+}
