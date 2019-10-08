@@ -1,0 +1,182 @@
+/*算法描述：
+	*设有MAXSIZE个连续单元供一个栈和队列使用，且栈和队列的实际占用单元事先并不知道，但是要求在
+	*任何时刻他们占用的单元数量都不能超过MAXSIZE，设计相关算法
+*/
+#include<iostream>
+#include<cstdlib>
+using namespace std;
+#define MAXSIZE 20
+typedef int ElementType;
+typedef struct StaticLinkListNode /*栈和链表均使用静态链表表示*/
+{
+	ElementType data;
+	int next; /*伪指针，指向下一个元素的下标*/
+}StaticLinkListNode;
+StaticLinkListNode S[MAXSIZE];
+typedef struct Stack
+{
+	int base; /*栈底指针*/
+	int top; /*栈顶指针*/
+}Stack;
+typedef struct Queue
+{
+	int front; /*队首指针*/
+	int rear; /*队尾指针*/
+}Queue;
+/*初始化静态链表*/
+void InitialSLinkList()
+{
+	for (int i = 0; i < MAXSIZE; i++)
+		S[i].next = -1;
+}
+/*栈的相关算法*/
+/*初始化栈*/
+void InitialStack(Stack &stack)
+{
+	stack.base = stack.top = -1;
+}
+/*判断栈空*/
+int EmptyStack(Stack stack)
+{
+	return (stack.top==-1);
+}
+/*元素进栈*/
+void EnStack(Stack &stack, ElementType x)
+{
+	int i;
+	for (i = 0; i < MAXSIZE; i++) /*找一个空位*/
+		if (S[i].next == -1)
+			break;
+	if (i == MAXSIZE)  /*说明栈满*/
+		return;
+	S[i].data = x; /*将x存放在空闲单元中*/
+	cout << "元素" << x << "存放在逻辑位置" << i << "的单元中" << endl;
+	if (stack.top == -1) /*栈为空栈*/
+	{
+		stack.top = stack.base = i;
+		S[i].next = i;
+		cout << "存放单元的next:" << S[i].next << endl;
+		cout << "栈stack的top=" << stack.top << " , base=" << stack.base << endl;
+	}
+	else
+	{
+		S[i].next = stack.top;
+		stack.top = i; /*新节点插入到栈头*/
+		cout << "存放单元的next:" << S[i].next << endl;
+		cout << "栈stack的top=" << stack.top << " , base=" << stack.base << endl;
+	}
+}
+/*退栈算法*/
+void DeStack(Stack &stack, ElementType &x)
+{
+	int i;
+	if (stack.top == -1)
+		return;
+	cout << stack.top << "位置的元素" << "出栈" << endl;
+	x = S[stack.top].data;
+	i = stack.top;
+	if (stack.top == stack.base)
+		stack.top = -1;
+	else
+		stack.top = S[stack.top].next;
+	S[i].next = -1;
+	return;
+}
+/*队列的相关算法*/
+/*队列初始化*/
+void InitialQueue(Queue &queue)
+{
+	queue.front = queue.rear = -1;
+}
+/*判断队列是否为空*/
+int EmptyQueue(Queue queue)
+{
+	return (queue.rear == -1);
+}
+/*元素进队列*/
+void EnQueue(Queue &queue, ElementType &x)
+{
+	int i;
+	for (i = 0; i < MAXSIZE; i++)
+		if (S[i].next == -1)
+			break;
+	if (i == MAXSIZE)
+		return;
+	S[i].data = x;
+	cout << "元素" << x << "存放在逻辑位置" << i << "的单元中" << endl;
+	if (queue.rear == -1)
+	{
+		queue.front = queue.rear = i;
+		S[i].next = i;
+		cout << "存放单元的next:" << S[i].next << endl;
+		cout << "队列queue的front=" << queue.front << " , rear=" << queue.rear << endl;
+	}
+	else
+	{
+		S[queue.rear].next = i;
+		queue.rear = i;
+		S[i].next = i;
+		cout << "存放单元的next:" << S[i].next << endl;
+		cout << "队列queue的front=" << queue.front << " , rear=" << queue.rear << endl;
+	}
+}
+/*元素出队列*/
+void DeQueue(Queue &queue, ElementType &x)
+{
+	int i;
+	if (queue.rear == -1)
+		return;
+	x = S[queue.front].data;
+	i = queue.front;
+	cout << queue.front << "位置的元素" << "出队列" << endl;
+	if (queue.rear == queue.front)
+		queue.front = queue.rear = -1;
+	else
+		queue.front = S[queue.front].next;
+	S[i].next = -1;
+}
+int main()
+{
+	int Element[15] = { 1,2,3,4,5,8,9,7,85,4 ,45,47,44,87,89};
+	ElementType se, qe;
+	Stack stack;
+	Queue queue;
+	int i=0;
+	InitialSLinkList();
+	InitialStack(stack);
+	InitialQueue(queue);
+	while (i < 15)
+	{	
+		if (i % 2 == 0)
+		{
+			cout << Element[i] << "进入栈" << endl;
+			EnStack(stack, Element[i]);
+			i++;
+		}
+		else
+		{
+			cout << Element[i] << "进入队列" << endl;
+			EnQueue(queue, Element[i]);
+			i++;
+		}
+	}
+	DeStack(stack, se);
+	cout << "出栈" << se << endl;
+
+	DeStack(stack, se);
+	cout << "出栈" << se << endl; 
+
+	DeQueue(queue, qe);
+	cout << "出队列" << qe << endl;
+
+	DeStack(stack, se);
+	cout << "出栈" << se << endl; 
+
+	DeStack(stack, se);
+	cout << "出栈" << se << endl;
+
+	DeQueue(queue, qe);
+	cout << "出队列" << qe << endl;
+	system("pause");
+	return 0;
+}
